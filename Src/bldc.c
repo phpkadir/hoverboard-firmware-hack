@@ -25,15 +25,27 @@ uint8_t enable = 0;
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
-const uint8_t hall_to_pos[8] = {
-    0,
-    0,
-    2,
-    1,
-    4,
-    5,
-    3,
-    0,
+const uint8_t hall2pos[2][2][2] = {
+  {
+    {
+      2,
+      2
+    },
+    {
+      4,
+      3
+    }
+  },
+  {
+    {
+      0,
+      1
+    },
+    {
+      5,
+      2
+    }
+  }
 };
 
 inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
@@ -196,23 +208,9 @@ void DMA1_Channel1_IRQHandler() {
   int ur, vr, wr;
 
   //determine next position based on hall sensors
-  uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
-  uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
-  uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
+  posl = hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)][!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)][!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
 
-  uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
-  uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
-  uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
-
-  uint8_t halll = hall_ul * 1 + hall_vl * 2 + hall_wl * 4;
-  posl          = hall_to_pos[halll];
-  posl += 2;
-  posl %= 6;
-
-  uint8_t hallr = hall_ur * 1 + hall_vr * 2 + hall_wr * 4;
-  posr          = hall_to_pos[hallr];
-  posr += 2;
-  posr %= 6;
+  posr = hall2pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)][!(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN)][!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
 
   blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &curl);
 

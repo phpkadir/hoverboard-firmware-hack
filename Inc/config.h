@@ -6,11 +6,19 @@
 #define PWM_FREQ         16000      // PWM frequency in Hz
 #define DEAD_TIME        32         // PWM deadtime
 
-#define DC_CUR_LIMIT     15         // Motor DC current limit in amps. it does not disable motors, it is a soft current limit.
+#define DC_CUR_LIMIT     25         // Motor DC current limit in amps. it does not disable motors, it is a soft current limit.
 
-#define BAT_LOW_LVL1     36.0       // gently beeps at this voltage level. ~3.6V/cell
-#define BAT_LOW_LVL2     33.0       // your battery is almost empty. Charge now! ~3.3V/cell
-#define BAT_LOW_DEAD     31.0       // undervoltage lockout. ~3.1V/cell
+#define BAT_CELL_CNT     12.0
+#define BAT_FULL_CELL    4.2
+#define BAT_RATED_CELL   3.7
+#define BAT_FULL         (BAT_CELL_CNT*BAT_FULL_CELL)
+#define BAT_RATED        (BAT_CELL_CNT*BAT_RATED_CELL)
+#define BAT_LOW1_CELL    3.5
+#define BAT_LOW2_CELL    3.2
+#define BAT_LOW_DEAD_CELL 3.0
+#define BAT_LOW_LVL1     (BAT_CELL_CNT*BAT_LOW1_CELL)       // gently beeps at this voltage level. ~3.6V/cell
+#define BAT_LOW_LVL2     (BAT_CELL_CNT*BAT_LOW2_CELL)       // your battery is almost empty. Charge now! ~3.3V/cell
+#define BAT_LOW_DEAD     (BAT_CELL_CNT*BAT_LOW_DEAD_CELL)       // undervoltage lockout. ~3.1V/cell
 
 // ################################################################################
 
