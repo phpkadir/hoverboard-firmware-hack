@@ -19,11 +19,12 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stm32f1xx_hal.h"
-#include "defines.h"
-#include "setup.h"
-#include "config.h"
-//#include "hd44780.h"
+#include "stm32f1xx_hal.h"  // main code for stm32 controller
+#include "defines.h"  // for the macros
+#include "setup.h"  // for access the functions form setup
+#include "bldc.h"  // for the main control variables
+#include "hd44780.h"  // for the display
+#include "config.h"  // the config
 
 void SystemClock_Config(void);
 
