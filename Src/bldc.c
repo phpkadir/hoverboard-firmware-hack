@@ -7,6 +7,8 @@
 
 volatile int posl = 0;
 volatile int posr = 0;
+volatile unsigned int freql;  // for later inplementation
+volatile unsigned int freqr;  // for later inplementation
 volatile int pwml = 0;
 volatile int pwmr = 0;
 volatile int weakl = 0;
@@ -87,7 +89,8 @@ inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
   }
 }
 
-inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
+//int curl = 0;
+/*inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
   switch(pos) {
     case 0:
       *q = u - v;
@@ -131,7 +134,7 @@ inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
       // *v = 0;
       // *w = 0;
   }
-}
+}*/
 
 uint16_t buzzerTimer        = 0;
 
@@ -145,7 +148,7 @@ int offsetdcr   = 2000;
 
 float batteryVoltage = 40.0;
 
-int curl = 0;
+
 // int errorl = 0;
 // int kp = 5;
 // volatile int cmdl = 0;
@@ -204,58 +207,45 @@ void DMA1_Channel1_IRQHandler() {
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
   }
 
-  int ul, vl, wl;
-  int ur, vr, wr;
-
   //determine next position based on hall sensors
   posl = hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)][!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)][!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
 
   posr = hall2pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)][!(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN)][!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
 
-  blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &curl);
+  //blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &curl);
 
   //setScopeChannel(2, (adc_buffer.rl1 - offsetrl1) / 8);
   //setScopeChannel(3, (adc_buffer.rl2 - offsetrl2) / 8);
 
   //create square wave for buzzer
   buzzerTimer++;
-  if (buzzerFreq != 0 && (buzzerTimer / 5000) % (buzzerPattern + 1) == 0) {
-    if (buzzerTimer % buzzerFreq == 0) {
+  if (buzzerFreq != 0 && (buzzerTimer / 5000) % (buzzerPattern + 1) == 0)
+    if (buzzerTimer % buzzerFreq == 0)
       HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
-    }
-  } else {
+  else
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
-  }
 
   //update PWM channels based on position
+  int ul, vl, wl, ur, vr, wr;
   blockPWM(pwml, posl, &ul, &vl, &wl);
   blockPWM(pwmr, posr, &ur, &vr, &wr);
 
-  int weakul, weakvl, weakwl;
-  if (pwml > 0) {
+  int weakul, weakvl, weakwl, weakur, weakvr, weakwr;
+  if (pwml > 0)
     blockPWM(weakl, (posl+5) % 6, &weakul, &weakvl, &weakwl);
-  } else {
+  else
     blockPWM(-weakl, (posl+1) % 6, &weakul, &weakvl, &weakwl);
-  }
-  ul += weakul;
-  vl += weakvl;
-  wl += weakwl;
 
-  int weakur, weakvr, weakwr;
-  if (pwmr > 0) {
+  if (pwmr > 0)
     blockPWM(weakr, (posr+5) % 6, &weakur, &weakvr, &weakwr);
-  } else {
+  else 
     blockPWM(-weakr, (posr+1) % 6, &weakur, &weakvr, &weakwr);
-  }
-  ur += weakur;
-  vr += weakvr;
-  wr += weakwr;
 
-  LEFT_TIM->LEFT_TIM_U = CLAMP(ul + pwm_res / 2, 10, pwm_res-10);
-  LEFT_TIM->LEFT_TIM_V = CLAMP(vl + pwm_res / 2, 10, pwm_res-10);
-  LEFT_TIM->LEFT_TIM_W = CLAMP(wl + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_U = CLAMP(ul + weakul + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_V = CLAMP(vl + weakvl + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_W = CLAMP(wl + weakwl + pwm_res / 2, 10, pwm_res-10);
 
-  RIGHT_TIM->RIGHT_TIM_U = CLAMP(ur + pwm_res / 2, 10, pwm_res-10);
-  RIGHT_TIM->RIGHT_TIM_V = CLAMP(vr + pwm_res / 2, 10, pwm_res-10);
-  RIGHT_TIM->RIGHT_TIM_W = CLAMP(wr + pwm_res / 2, 10, pwm_res-10);
+  RIGHT_TIM->RIGHT_TIM_U = CLAMP(ur + weakur + pwm_res / 2, 10, pwm_res-10);
+  RIGHT_TIM->RIGHT_TIM_V = CLAMP(vr + weakvr + pwm_res / 2, 10, pwm_res-10);
+  RIGHT_TIM->RIGHT_TIM_W = CLAMP(wr + weakwr + pwm_res / 2, 10, pwm_res-10);
 }

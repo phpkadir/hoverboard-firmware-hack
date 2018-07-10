@@ -54,18 +54,12 @@ uint8_t button1, button2;
 int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
-extern volatile int pwml;  // global variable for pwm left. -1000 to 1000
-extern volatile int pwmr;  // global variable for pwm right. -1000 to 1000
-extern volatile int weakl; // global variable for field weakening left. -1000 to 1000
-extern volatile int weakr; // global variable for field weakening right. -1000 to 1000
-
 extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1, 2, 3, 4, 5, 6, 7...
 extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
 
 extern uint8_t enable; // global variable for motor enable
 
 extern volatile uint32_t timeout; // global variable for timeout
-extern float batteryVoltage; // global variable for battery voltage
 
 extern uint8_t nunchuck_data[6];
 #ifdef CONTROL_PPM
