@@ -1,6 +1,9 @@
+# Hoverboard-Firmware-Hack
+
+[![Build Status](https://travis-ci.com/BobbyIndustries/hoverboard-firmware-hack.svg?branch=master)](https://travis-ci.com/BobbyIndustries/hoverboard-firmware-hack)
+
 This firmware is much better than the old one. tested up to 40A / 60V, no dead board so far :)
 
-## hoverboard-firmware-hack
 
 This repo contains open source firmware for generic Hoverboard Mainboards.
 The firmware you can find here allows you to use your Hoverboard Hardware (like the Mainboard, Motors and Battery) for cool projects like driving armchairs, person-tracking transportation robots and every other application you can imagine that requires controlling the Motors.
