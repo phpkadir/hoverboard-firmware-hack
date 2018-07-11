@@ -27,7 +27,7 @@ uint8_t enable = 0;
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
-void calcWeakening(int pwm,int freq){
+int calcWeakening(int pwm,int freq){
   if (freq < START_FREQ) return 0;
   if (freq >= END_FREQ)
     return pwm*FEALD_WEAKENING_MAX/100;
