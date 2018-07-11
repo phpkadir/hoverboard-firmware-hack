@@ -27,6 +27,14 @@ uint8_t enable = 0;
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
+void calcWeakening(int pwm,int freq){
+  if (freq < START_FREQ) return 0;
+  if (freq >= END_FREQ)
+    return pwm*FEALD_WEAKENING_MAX/100;
+  else
+    return (freq-START_FREQ)*pwm*FEALD_WEAKENING_MAX/100/(END_FREQ-START_FREQ);
+}
+
 const uint8_t hall2pos[2][2][2] = {
   {
     {
@@ -193,19 +201,15 @@ void DMA1_Channel1_IRQHandler() {
 
 
   //disable PWM when current limit is reached (current chopping)
-  if(ABS((adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0) {
+  if(ABS((adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0)
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
-    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
-  } else {
+  else
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
-    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
-  }
 
-  if(ABS((adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP)  > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0) {
+  if(ABS((adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP)  > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0)
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
-  } else {
+  else
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
-  }
 
   //determine next position based on hall sensors
   posl = hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)][!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)][!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
@@ -231,15 +235,8 @@ void DMA1_Channel1_IRQHandler() {
   blockPWM(pwmr, posr, &ur, &vr, &wr);
 
   int weakul, weakvl, weakwl, weakur, weakvr, weakwr;
-  if (pwml > 0)
-    blockPWM(weakl, (posl+5) % 6, &weakul, &weakvl, &weakwl);
-  else
-    blockPWM(-weakl, (posl+1) % 6, &weakul, &weakvl, &weakwl);
-
-  if (pwmr > 0)
-    blockPWM(weakr, (posr+5) % 6, &weakur, &weakvr, &weakwr);
-  else 
-    blockPWM(-weakr, (posr+1) % 6, &weakur, &weakvr, &weakwr);
+  blockPWM(calcWeakening(pwml, freql), (pwml > 0) ? (posl+5) % 6 : (posl+1) % 6, &weakul, &weakvl, &weakwl);
+  blockPWM(calcWeakening(pwmr, freqr), (pwmr > 0) ? (posr+5) % 6 : (posr+1) % 6, &weakur, &weakvr, &weakwr);
 
   LEFT_TIM->LEFT_TIM_U = CLAMP(ul + weakul + pwm_res / 2, 10, pwm_res-10);
   LEFT_TIM->LEFT_TIM_V = CLAMP(vl + weakvl + pwm_res / 2, 10, pwm_res-10);

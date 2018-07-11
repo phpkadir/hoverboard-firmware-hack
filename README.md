@@ -2,7 +2,10 @@
 
 [![Build Status](https://travis-ci.com/BobbyIndustries/hoverboard-firmware-hack.svg?branch=master)](https://travis-ci.com/BobbyIndustries/hoverboard-firmware-hack)
 
+### Under heavy development
+
 This firmware is much better than the old one. tested up to 40A / 60V, no dead board so far :)
+But The Firmware can't do inpossible Stuff pleace stay at 12s (under 50V) because the boards use condensators up to 50V higher voltages damage them.
 
 
 This repo contains open source firmware for generic Hoverboard Mainboards.

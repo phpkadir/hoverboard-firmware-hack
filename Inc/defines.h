@@ -147,6 +147,12 @@
 #define MIN3(a, b, c) MIN(a, MIN(b, c))
 #define MAX3(a, b, c) MAX(a, MAX(b, c))
 
+#define BAT_LOW_LVL1     (BAT_CELL_CNT*BAT_LOW1_CELL)       // gently beeps at this voltage level. ~3.6V/cell
+#define BAT_LOW_LVL2     (BAT_CELL_CNT*BAT_LOW2_CELL)       // your battery is almost empty. Charge now! ~3.3V/cell
+#define BAT_LOW_DEAD     (BAT_CELL_CNT*BAT_LOW_DEAD_CELL)       // undervoltage lockout. ~3.1V/cell
+#define BAT_FULL         (BAT_CELL_CNT*BAT_FULL_CELL)
+#define BAT_RATED        (BAT_CELL_CNT*BAT_RATED_CELL)
+
 typedef struct {
   uint16_t rr1;
   uint16_t rr2;
