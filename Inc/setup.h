@@ -23,6 +23,14 @@
 
 #include "stm32f1xx_hal.h"
 
+extern TIM_HandleTypeDef htim_left;
+extern TIM_HandleTypeDef htim_right;
+extern ADC_HandleTypeDef hadc1;
+extern ADC_HandleTypeDef hadc2;
+extern I2C_HandleTypeDef hi2c2;
+extern UART_HandleTypeDef huart2;
+extern volatile adc_buf_t adc_buffer;
+
 void MX_GPIO_Init(void);
 void MX_TIM_Init(void);
 void MX_ADC1_Init(void);

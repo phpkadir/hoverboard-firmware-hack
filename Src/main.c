@@ -28,14 +28,7 @@
 
 void SystemClock_Config(void);
 
-extern TIM_HandleTypeDef htim_left;
-extern TIM_HandleTypeDef htim_right;
-extern ADC_HandleTypeDef hadc1;
-extern ADC_HandleTypeDef hadc2;
-extern volatile adc_buf_t adc_buffer;
 //LCD_PCF8574_HandleTypeDef lcd;
-extern I2C_HandleTypeDef hi2c2;
-extern UART_HandleTypeDef huart2;
 
 int cmd1;  // normalized input values. -1000 to 1000
 int cmd2;
@@ -59,8 +52,6 @@ extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1,
 extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
 
 extern uint8_t enable; // global variable for motor enable
-
-extern volatile uint32_t timeout; // global variable for timeout
 
 extern uint8_t nunchuck_data[6];
 #ifdef CONTROL_PPM

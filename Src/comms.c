@@ -5,7 +5,7 @@
 #include "stdio.h"
 #include "string.h"
 
-UART_HandleTypeDef huart2;
+//UART_HandleTypeDef huart2;
 
 #ifdef DEBUG_SERIAL_USART3
 #define UART_DMA_CHANNEL DMA1_Channel2
@@ -14,7 +14,6 @@ UART_HandleTypeDef huart2;
 #ifdef DEBUG_SERIAL_USART2
 #define UART_DMA_CHANNEL DMA1_Channel7
 #endif
-
 
 volatile uint8_t uart_buf[100];
 volatile int16_t ch_buf[8];
