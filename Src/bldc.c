@@ -14,6 +14,12 @@ volatile int pwmr = 0;
 volatile int weakl = 0;
 volatile int weakr = 0;
 
+int lst_posl = 0;
+int lst_isr_posl = 0;
+int lst_posr = 0;
+int lst_isr_posr = 0;
+int isr_counter = 0;
+
 extern volatile int speed;
 
 extern volatile adc_buf_t adc_buffer;
@@ -161,8 +167,6 @@ float batteryVoltage = 40.0;
 // int kp = 5;
 // volatile int cmdl = 0;
 
-int last_pos = 0;
-int timer = 0;
 const int max_time = PWM_FREQ / 10;
 volatile int vel = 0;
 
@@ -170,6 +174,7 @@ volatile int vel = 0;
 //meaning ~80 ADC clock cycles @ 8MHz until new DMA interrupt =~ 100KHz
 //=640 cpu cycles
 void DMA1_Channel1_IRQHandler() {
+  isr_counter++; // I hope its a timer interrupt :)
   DMA1->IFCR = DMA_IFCR_CTCIF1;
   // HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
 
@@ -213,9 +218,16 @@ void DMA1_Channel1_IRQHandler() {
 
   //determine next position based on hall sensors
   posl = hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)][!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)][!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
-
   posr = hall2pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)][!(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN)][!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
 
+  if (posl != lst_posl) {
+    freql = isr_counter - lst_isr_posl;
+    lst_isr_posl = isr_counter;
+  }
+  if (posr != lst_posr) {
+    freqr = isr_counter - lst_isr_posr;
+    lst_isr_posr = isr_counter;
+  }
   //blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &curl);
 
   //setScopeChannel(2, (adc_buffer.rl1 - offsetrl1) / 8);

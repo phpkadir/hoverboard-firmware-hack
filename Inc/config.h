@@ -14,7 +14,7 @@
 #define BAT_LOW1_CELL    3.5
 #define BAT_LOW2_CELL    3.2
 #define BAT_LOW_DEAD_CELL 3.0
-
+#define FEALD_WEAKENING_MAX 40
 // ################################################################################
 
 #define DEBUG_SERIAL_USART3         // left sensor board cable, disable if ADC or PPM is used!
