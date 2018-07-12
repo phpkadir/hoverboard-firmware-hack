@@ -224,10 +224,14 @@ void DMA1_Channel1_IRQHandler() {
     freql = isr_counter - lst_isr_posl;
     lst_isr_posl = isr_counter;
   }
+  else if (freql < isr_counter - lst_isr_posl)
+    freql = isr_counter - lst_isr_posl;
   if (posr != lst_posr) {
     freqr = isr_counter - lst_isr_posr;
     lst_isr_posr = isr_counter;
   }
+  else if (freqr < isr_counter - lst_isr_posr)
+    freqr = isr_counter - lst_isr_posr;
   //blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &curl);
 
   //setScopeChannel(2, (adc_buffer.rl1 - offsetrl1) / 8);
