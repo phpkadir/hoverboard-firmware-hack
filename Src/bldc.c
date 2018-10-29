@@ -98,7 +98,7 @@ inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
 }
 
 //int curl = 0;
-/*inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
+inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
   switch(pos) {
     case 0:
       *q = u - v;
@@ -142,14 +142,16 @@ inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
       // *v = 0;
       // *w = 0;
   }
-}*/
+}
 
-int offsetrl1   = 2000;
-int offsetrl2   = 2000;
-int offsetrr1   = 2000;
-int offsetrr2   = 2000;
-int offsetdcl   = 2000;
-int offsetdcr   = 2000;
+uint16_t offsetrl1   = 2048,
+  offsetrl2   = 2048,
+  offsetrr1   = 2048,
+  offsetrr2   = 2048,
+  offsetdcl   = 2048,
+  offsetdcr   = 2048;
+
+unsigned long mainCounter = 0;
 
 float batteryVoltage = 40.0;
 
@@ -197,6 +199,13 @@ void oldBuzzer(){
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
   }
 }
+int currentlr[2];
+int pwmlr[2];
+uint timer[2];
+uint8_t last_pos[2];
+int weaklr[2];
+uint phase_period[2];
+int blockcurlr[2];
 void brushless_countrol(){
   if((currentlr[0] = ABS(adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT)
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
@@ -210,6 +219,7 @@ void brushless_countrol(){
   //PWM part
   int phase[3];
   int wphase[3];
+  uint8_t poslr[2];
   //update PWM channels based on position
   for(int x = 0; x < 3; x++){
     poslr[x] = get_pos[x];
@@ -259,7 +269,7 @@ void DMA1_Channel1_IRQHandler() {
   timer_brushless();
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
-  if (mainCounter % 1000 == 0) {  // because you get float rounding errors if it would run every time
+  if (!(mainCounter & 0x3FF) {  // because you get float rounding errors if it would run every time every 1024th time
     batteryVoltage = batteryVoltage * 0.99 + ((float)adc_buffer.batt1 * ((float)BAT_CALIB_REAL_VOLTAGE / (float)BAT_CALIB_ADC)) * 0.01;
   }// murks
   blockPhaseCurrent(poslr[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
