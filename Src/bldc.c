@@ -2,6 +2,7 @@
 #include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"
+#include "control.h"
 #include "config.h"
 
 
@@ -16,16 +17,15 @@ int lst_posr = 0;
 int lst_isr_posr = 0;
 int isr_counter = 0;
 
-extern volatile adc_buf_t adc_buffer;
-
-extern volatile uint32_t timeout;
-
 uint8_t buzzerFreq = 0;
 uint8_t buzzerPattern = 0;
 
 uint8_t enable = 0;
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
+
+#define START_FREQ 0
+#define END_FREQ 0
 
 int calcWeakening(int pwm,int freq){ // never used
   if (freq < START_FREQ) return 0;
@@ -164,21 +164,21 @@ void set_motor_r(int *hPhase){
   RIGHT_TIM->RIGHT_TIM_W = CLAMP(hPhase[2] + pwm_res / 2, 10, pwm_res-10);
 }
 void set_motor_l(int *hPhase){
-  LEFT_TIM->LEFT_TIM_U = CLAMP(phase[0] + pwm_res / 2, 10, pwm_res-10);
-  LEFT_TIM->LEFT_TIM_V = CLAMP(phase[1] + pwm_res / 2, 10, pwm_res-10);
-  LEFT_TIM->LEFT_TIM_W = CLAMP(phase[2] + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_U = CLAMP(hPhase[0] + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_V = CLAMP(hPhase[1] + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_W = CLAMP(hPhase[2] + pwm_res / 2, 10, pwm_res-10);
 }
 setMotorType set_motor[2] = { //array for loop
   set_motor_l,
   set_motor_r
 };
 uint8_t get_pos_l(){
-  return hall_to_pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)]
+  return hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)]
     [!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)]
       [!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
 }
 uint8_t get_pos_r(){
-  return hall_to_pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)]
+  return hall2pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)]
     [!(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN)]
       [!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
 }
@@ -239,6 +239,8 @@ void brushless_countrol(){
     } else if(timer[x] > phase_period[x])
       timer[x] = phase_period[x];
   }
+  //blockPhaseCurrent(poslr[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
+  //blockPhaseCurrent(poslr[1], adc_buffer.rr1 - offsetrr1, adc_buffer.rr2 - offsetrr2, &blockcurlr[1]); //Old shitty code
 }
 
 typedef void (*IsrPtr)();
@@ -269,9 +271,7 @@ void DMA1_Channel1_IRQHandler() {
   timer_brushless();
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
-  if (!(mainCounter & 0x3FF) {  // because you get float rounding errors if it would run every time every 1024th time
+  if (!(mainCounter & 0x3FF))  // because you get float rounding errors if it would run every time every 1024th time
     batteryVoltage = batteryVoltage * 0.99 + ((float)adc_buffer.batt1 * ((float)BAT_CALIB_REAL_VOLTAGE / (float)BAT_CALIB_ADC)) * 0.01;
-  }// murks
-  blockPhaseCurrent(poslr[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
-  blockPhaseCurrent(poslr[1], adc_buffer.rr1 - offsetrr1, adc_buffer.rr2 - offsetrr2, &blockcurlr[1]); //Old shitty code
+  // murks
 }

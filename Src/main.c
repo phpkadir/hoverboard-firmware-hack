@@ -23,8 +23,9 @@
 #include "defines.h"  // for the macros
 #include "setup.h"  // for access the functions form setup
 #include "bldc.h"  // for the main control variables
-#include "hd44780.h"  // for the display
+//#include "hd44780.h"  // for the display
 #include "config.h"  // the config
+#include "control.h"
 
 void SystemClock_Config(void);
 
@@ -211,14 +212,14 @@ int main(void) {
     // ####### SET OUTPUTS #######
     if ((speedL < lastSpeedL + 50 && speedL > lastSpeedL - 50) && (speedR < lastSpeedR + 50 && speedR > lastSpeedR - 50) && timeout < TIMEOUT) {
     #ifdef INVERT_R_DIRECTION
-      pwmr = speedR;
+      pwmlr[1] = speedR;
     #else
-      pwmr = -speedR;
+      pwmlr[1] = -speedR;
     #endif
     #ifdef INVERT_L_DIRECTION
-      pwml = -speedL;
+      pwmlr[0] = -speedL;
     #else
-      pwml = speedL;
+      pwmlr[0] = speedL;
     #endif
     }
 
