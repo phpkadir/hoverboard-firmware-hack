@@ -188,7 +188,7 @@ void oldBuzzer(){
   }
 }
 volatile int currentlr[2];
-volatile int pwmlr[2];
+volatile int throttlelr[2];
 volatile uint timer[2];
 volatile uint8_t last_pos[2];
 volatile uint phase_period[2];
@@ -212,7 +212,7 @@ void brushless_countrol(){
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
     uint8_t pos = get_pos[x];
-    RetValWeak tmp = currentWeaking(pwmlr[x], phase_period[x],timer[x],currentlr[x]);
+    RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
     blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
     blockPWM(tmp.weak, (pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
     for(int y = 0; y < 3; y++)

@@ -3,16 +3,17 @@
 #include "bldc.h"
 #include "config.h"
 
-RetValWeak nullFuncWeak(int pwm, uint period, uint cur_phase, int current){
-  return (RetValWeak){ .pwm  = pwm, .weak = 0};
+RetValWeak nullFuncWeak(int torque, uint period, uint cur_phase, int current){
+  map()
+  return (RetValWeak){ .pwm  = torque, .weak = 0};
 }
-RetValWeak turboBtn(int pwm, uint period, uint cur_phase, int current){
+RetValWeak turboBtn(int torque, uint period, uint cur_phase, int current){
   if(pwm>900 && period < 0)
-    return (RetValWeak){ .pwm  = pwm, .weak = 0};
+    return (RetValWeak){ .pwm  = torque, .weak = 0};
   else
-    return (RetValWeak){ .pwm  = pwm, .weak = 0};
+    return (RetValWeak){ .pwm  = torque, .weak = 0};
 }
-RetValWeak optWeaking(int pwm, uint period, uint cur_phase, int current){
+RetValWeak optWeaking(int torque, uint period, uint cur_phase, int current){
   return (RetValWeak){ .pwm  = PWM_MAX, .weak = 0};
 }
 

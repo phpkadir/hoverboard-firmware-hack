@@ -228,14 +228,14 @@ int main(void) {
     // ####### SET OUTPUTS #######
     if ((speedL < lastSpeedL + 50 && speedL > lastSpeedL - 50) && (speedR < lastSpeedR + 50 && speedR > lastSpeedR - 50) && timeout < TIMEOUT) {
     #ifdef INVERT_R_DIRECTION
-      pwmlr[1] = speedR;
+      throttlelr[1] = speedR;
     #else
-      pwmlr[1] = -speedR;
+      throttlelr[1] = -speedR;
     #endif
     #ifdef INVERT_L_DIRECTION
-      pwmlr[0] = -speedL;
+      throttlelr[0] = -speedL;
     #else
-      pwmlr[0] = speedL;
+      throttlelr[0] = speedL;
     #endif
     }
 

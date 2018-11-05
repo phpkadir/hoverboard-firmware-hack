@@ -1,7 +1,7 @@
 #pragma once
 #include "weaking.h"
 extern int currentlr[2];
-extern int pwmlr[2];
+extern int throttlelr[2];
 extern uint timer[2];
 extern uint8_t last_pos[2];
 extern uint phase_period[2];
