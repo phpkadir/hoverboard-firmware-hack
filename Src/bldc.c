@@ -4,6 +4,7 @@
 #include "setup.h"
 #include "control.h"
 #include "config.h"
+#include "weaking.h"
 
 uint8_t buzzerFreq = 0;
 uint8_t buzzerPattern = 0;
@@ -194,10 +195,6 @@ volatile int weaklr[2];
 volatile uint phase_period[2];
 volatile int blockcurlr[2];
 
-typedef int (*WeakingPtr)(int pwm, uint period, uint cur_phase, int current);
-int nullFuncWeak(int pwm, uint period, uint cur_phase, int current){
-  return 0;
-}
 volatile WeakingPtr currentWeaking = nullFuncWeak;
 
 void brushless_countrol(){
