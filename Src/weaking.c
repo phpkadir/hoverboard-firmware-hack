@@ -23,7 +23,7 @@ RetValWeak optWeaking(int torque, uint period, uint cur_phase, int current){//to
   return (RetValWeak){ .pwm  = PWM_MAX, .weak = 0};
 }
 
-const WeakStruct weakfunctions[] = {{nullFuncWeak,"Off", 0},{STVO6kmh,"STVO", 5},{longRange,"LongRange", 15},{fastMode,"fast",20},{optWeaking,"noLimit",60}};
+const WeakStruct weakfunctions[] = {{nullFuncWeak," Off", 0},{STVO6kmh,"STVO", 5},{longRange,"LoRa", 15},{fastMode,"Fast",20},{optWeaking,"Race",60}};
 void set_weaking(int x){
   currentWeaking = weakfunctions[x].func;
   current_limit = weakfunctions[x].cur_limit;
