@@ -28,6 +28,6 @@ void set_weaking(int x){
   currentWeaking = weakfunctions[x].func;
   current_limit = weakfunctions[x].cur_limit;
 }
-char* get_weaking_name(int x){
+const char* get_weaking_name(int x){
   return weakfunctions[x].name;
 }

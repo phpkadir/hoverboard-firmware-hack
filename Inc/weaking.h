@@ -4,3 +4,6 @@ typedef RetValWeak (*WeakingPtr)(int torque, uint period, uint cur_phase, int cu
 typedef struct {WeakingPtr func; const char* name; uint cur_limit;} WeakStruct;
 RetValWeak nullFuncWeak(int pwm, uint period, uint cur_phase, int current);
 extern const WeakStruct weakfunctions[];
+
+void set_weaking(int x);
+const char* get_weaking_name(int x);
