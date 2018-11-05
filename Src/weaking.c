@@ -3,16 +3,16 @@
 #include "bldc.h"
 
 RetValWeak nullFuncWeak(int pwm, uint period, uint cur_phase, int current){
-  return {0,0};
+  return (RetValWeak){ .pwm  = pwm, .weak = 0};
 }
 RetValWeak turboBtn(int pwm, uint period, uint cur_phase, int current){
   if(pwm>900 && period < 0)
-    return {pwm,WEAKING_PWM_MAX};
+    return (RetValWeak){ .pwm  = pwm, .weak = 0};
   else
-    return {pwm,0};
+    return (RetValWeak){ .pwm  = pwm, .weak = 0};
 }
 RetValWeak optWeaking(int pwm, uint period, uint cur_phase, int current){
-  
+  return (RetValWeak){ .pwm  = pwm, .weak = 0};
 }
 
 const WeakStruct weakfunctions[] = {{nullFuncWeak,"!Weaked"},{turboBtn,"Turbo"}};

@@ -173,22 +173,16 @@ int main(void) {
       speedRL = (float)speedRL * LOSLASS_BREMS_ACC  // bremsen wenn kein poti gedrueckt
               - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 280.0f)) * DRUECK_ACC1  // links gedrueckt = zusatzbremsen oder rueckwaertsfahren
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 350.0f)) * DRUECK_ACC2;  // vorwaerts gedrueckt = beschleunigen 12s: 350=3kmh
-      weaklr[0] = 0;
-      weaklr[1] = 0;
 
     } else if (mode == 2) { // Mode 2, default: 6 kmh
       speedRL = (float)speedRL * LOSLASS_BREMS_ACC
               - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 310.0f)) * DRUECK_ACC1
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 420.0f)) * DRUECK_ACC2;  // 12s: 400=5-6kmh 450=7kmh
-      weaklr[0] = 0;
-      weaklr[1] = 0;
 
     } else if (mode == 3) { // Mode 3, rechts: 12 kmh
       speedRL = (float)speedRL * LOSLASS_BREMS_ACC
               - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 340.0f)) * DRUECK_ACC1
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 600.0f)) * DRUECK_ACC2;  // 12s: 600=12kmh
-      weaklr[0] = 0;
-      weaklr[1] = 0;
 
     } else if (mode == 4) { // Mode 4, l + r: full kmh
       // Feldschwaechung wird nur aktiviert wenn man schon sehr schnell ist. So gehts: Rechts voll druecken und warten bis man schnell ist, dann zusaetzlich links schnell voll druecken.
@@ -202,7 +196,6 @@ int main(void) {
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 1000.0f)) * DRUECK_ACC2;  // 12s: 1000=22kmh
         weak = weak * 0.95;  // sanftes abschalten des turbos
       }
-      weaklr[0] = weaklr[1] = (int)weak; // weak should never exceed 400 or 450 MAX!!
     }
 
     speed = speedR = speedL = CLAMP(speedRL, -1000, 1000);  // clamp output
