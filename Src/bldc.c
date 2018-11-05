@@ -5,16 +5,6 @@
 #include "control.h"
 #include "config.h"
 
-
-volatile int pwml = 0;
-volatile int pwmr = 0;
-
-int lst_posl = 0;
-int lst_isr_posl = 0;
-int lst_posr = 0;
-int lst_isr_posr = 0;
-int isr_counter = 0;
-
 uint8_t buzzerFreq = 0;
 uint8_t buzzerPattern = 0;
 
@@ -95,7 +85,6 @@ inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
   }
 }
 
-//int curl = 0;
 inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
   switch(pos) {
     case 0:
@@ -149,9 +138,9 @@ uint16_t offsetrl1   = 2048,
   offsetdcl   = 2048,
   offsetdcr   = 2048;
 
-unsigned long mainCounter = 0;
+volatile unsigned long mainCounter = 0;
 
-float batteryVoltage = 40.0;
+volatile float batteryVoltage = 40.0;
 
 const int max_time = PWM_FREQ / 10; // never used
 
@@ -197,13 +186,20 @@ void oldBuzzer(){
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
   }
 }
-int currentlr[2];
-int pwmlr[2];
-uint timer[2];
-uint8_t last_pos[2];
-int weaklr[2];
-uint phase_period[2];
-int blockcurlr[2];
+volatile int currentlr[2];
+volatile int pwmlr[2];
+volatile uint timer[2];
+volatile uint8_t last_pos[2];
+volatile int weaklr[2];
+volatile uint phase_period[2];
+volatile int blockcurlr[2];
+
+typedef int (*WeakingPtr)(int pwm, uint period, uint cur_phase, int current);
+int nullFuncWeak(int pwm, uint period, uint cur_phase, int current){
+  return 0;
+}
+volatile WeakingPtr currentWeaking = nullFuncWeak;
+
 void brushless_countrol(){
   if((currentlr[0] = ABS(adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT)
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
@@ -219,13 +215,11 @@ void brushless_countrol(){
   int wphase[3];
   uint8_t poslr[2];
   //update PWM channels based on position
-  for(int x = 0; x < 3; x++){
+  for(int x = 0; x < 2; x++){
     poslr[x] = get_pos[x];
     blockPWM(pwmlr[x], poslr[x], &phase[0], &phase[1], &phase[2]);
-    if (pwmlr[x] > 0)
-      blockPWM(weaklr[x], (poslr[x]+5) % 6, &wphase[0], &wphase[1], &wphase[2]);
-    else
-      blockPWM(-weaklr[x], (poslr[x]+1) % 6, &wphase[0], &wphase[1], &wphase[2]);
+    weaklr[x] = currentWeaking(pwmlr[x], phase_period[x],timer[x],currentlr[x]);
+    blockPWM(weaklr[x], (poslr[x]+(pwmlr[x] > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
     for(int y = 0; y < 3; y++)
       phase[y] += wphase[y];
     set_motor[x](phase);
@@ -237,14 +231,14 @@ void brushless_countrol(){
     } else if(timer[x] > phase_period[x])
       timer[x] = phase_period[x];
   }
-  //blockPhaseCurrent(poslr[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
-  //blockPhaseCurrent(poslr[1], adc_buffer.rr1 - offsetrr1, adc_buffer.rr2 - offsetrr2, &blockcurlr[1]); //Old shitty code
+  blockPhaseCurrent(poslr[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
+  blockPhaseCurrent(poslr[1], adc_buffer.rr1 - offsetrr1, adc_buffer.rr2 - offsetrr2, &blockcurlr[1]); //Old shitty code
 }
 
 typedef void (*IsrPtr)();
-
 volatile IsrPtr timer_brushless = calibration_func;
 volatile IsrPtr buzzerFunc = nullFunc;
+
 void calibration_func(){
   if(mainCounter < 1024) {  // calibrate ADC offsets
     offsetrl1 = (adc_buffer.rl1 + offsetrl1) / 2;
