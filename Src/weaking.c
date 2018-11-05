@@ -1,14 +1,18 @@
 #include "stm32f1xx_hal.h"
 #include "weaking.h"
 #include "bldc.h"
-int nullFuncWeak(int pwm, uint period, uint cur_phase, int current){
-  return 0;
+
+RetValWeak nullFuncWeak(int pwm, uint period, uint cur_phase, int current){
+  return {0,0};
 }
-int turboBtn(int pwm, uint period, uint cur_phase, int current){
-  if(pwm>900)
-    return WEAKING_PWM_MAX;
+RetValWeak turboBtn(int pwm, uint period, uint cur_phase, int current){
+  if(pwm>900 && period < 0)
+    return {pwm,WEAKING_PWM_MAX};
   else
-    return 0;
+    return {pwm,0};
+}
+RetValWeak optWeaking(int pwm, uint period, uint cur_phase, int current){
+  
 }
 
 const WeakStruct weakfunctions[] = {{nullFuncWeak,"!Weaked"},{turboBtn,"Turbo"}};
