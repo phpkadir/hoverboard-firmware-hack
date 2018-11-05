@@ -248,14 +248,24 @@ void calibration_func(){
   }
 }
 
+void set_bldc_motors(bool enable){
+  if(timer_brushless != calibration_func){
+    if(enable)
+      timer_brushless = brushless_countrol;
+    else
+      timer_brushless = nullFunc;
+  }
+
+}
+
 //scan 8 channels with 2ADCs @ 20 clk cycles per sample
 //meaning ~80 ADC clock cycles @ 8MHz until new DMA interrupt =~ 100KHz
 //=640 cpu cycles
 void DMA1_Channel1_IRQHandler() {
   DMA1->IFCR = DMA_IFCR_CTCIF1;
   mainCounter++;
-  buzzerFunc();
   timer_brushless();
+  buzzerFunc();
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
   if (!(mainCounter & 0x3FF))  // because you get float rounding errors if it would run every time every 1024th time

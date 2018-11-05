@@ -50,12 +50,7 @@ uint8_t button1, button2;
 int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
-extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1, 2, 3, 4, 5, 6, 7...
-extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
-
-extern uint8_t enable; // global variable for motor enable
-
-int weak =0, mode =2;
+int mode =2;
 extern uint8_t nunchuck_data[6];
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
@@ -148,7 +143,7 @@ int main(void) {
     LCD_WriteString(&lcd, "Initializing...");
   #endif
 
-  enable = 1;  // enable motors
+  set_bldc_motors(true);
 
   while(1) {
     HAL_Delay(5);
@@ -198,7 +193,7 @@ int main(void) {
       }
     }
 
-    speed = speedR = speedL = CLAMP(speedRL, -1000, 1000);  // clamp output
+    speed = CLAMP(speedRL, -1000, 1000);  // clamp output
 
       timeout = 0;
     #endif
@@ -246,7 +241,7 @@ int main(void) {
     consoleScope();
 
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
-      enable = 0;
+      set_bldc_motors(false);
       while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
       buzzerFreq = 0;
       buzzerPattern = 0;
@@ -266,7 +261,7 @@ int main(void) {
       buzzerPattern = 1;
     } else if  (batteryVoltage < BAT_LOW_DEAD) {
       buzzerPattern = 0;
-      enable = 0;
+      set_bldc_motors(false);
       for (int i = 0; i < 8; i++) {
         buzzerFreq = i;
         HAL_Delay(100);
