@@ -111,7 +111,8 @@ else {\
   weakr = 0;
 
 // #define BEEPS_BACKWARD
-
+#define PWM_MAX 1000
+#define WEAKING_PWM_MAX 450
 // ################################################################################
 
 // validate settings (do not touch this):
