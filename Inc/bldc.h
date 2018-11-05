@@ -1,5 +1,6 @@
 #pragma once
 #include "weaking.h"
+extern volatile uint current_limit;
 extern int currentlr[2];
 extern int throttlelr[2];
 extern uint timer[2];

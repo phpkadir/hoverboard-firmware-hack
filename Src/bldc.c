@@ -9,8 +9,6 @@
 uint8_t buzzerFreq = 0;
 uint8_t buzzerPattern = 0;
 
-uint8_t enable = 0;
-
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
 #define START_FREQ 0
@@ -187,6 +185,7 @@ void oldBuzzer(){
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
   }
 }
+volatile uint current_limit;
 volatile int currentlr[2];
 volatile int throttlelr[2];
 volatile uint timer[2];
@@ -197,12 +196,12 @@ volatile int blockcurlr[2];
 volatile WeakingPtr currentWeaking = nullFuncWeak;
 
 void brushless_countrol(){
-  if((currentlr[0] = ABS(adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT)
+  if((currentlr[0] = ABS(adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
   else
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
 
-  if((currentlr[1] = ABS(adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT)
+  if((currentlr[1] = ABS(adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
   else
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
