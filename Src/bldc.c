@@ -8,8 +8,6 @@
 
 volatile int pwml = 0;
 volatile int pwmr = 0;
-volatile int weakl = 0;
-volatile int weakr = 0;
 
 int lst_posl = 0;
 int lst_isr_posl = 0;
