@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include "weaking.h"
 extern volatile uint current_limit;
 extern int currentlr[2];

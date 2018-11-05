@@ -19,6 +19,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdbool.h>
 #include "stm32f1xx_hal.h"  // main code for stm32 controller
 #include "defines.h"  // for the macros
 #include "setup.h"  // for access the functions form setup
@@ -184,12 +185,12 @@ int main(void) {
       if (adc1_filtered > (ADC1_MAX - 450) && speedRL > 800) { // field weakening at high speeds
         speedRL = (float)speedRL * LOSLASS_BREMS_ACC
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 1000.0f)) * DRUECK_ACC2;
-        weak = weak * 0.95 + 400.0 * 0.05;  // sanftes hinzuschalten des turbos, 12s: 400=29kmh
+        //weak = weak * 0.95 + 400.0 * 0.05;  // sanftes hinzuschalten des turbos, 12s: 400=29kmh
       } else { //normale fahrt ohne feldschwaechung
         speedRL = (float)speedRL * LOSLASS_BREMS_ACC
               - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 340.0f)) * DRUECK_ACC1
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 1000.0f)) * DRUECK_ACC2;  // 12s: 1000=22kmh
-        weak = weak * 0.95;  // sanftes abschalten des turbos
+        //weak = weak * 0.95;  // sanftes abschalten des turbos
       }
     }
 

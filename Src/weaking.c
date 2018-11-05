@@ -14,7 +14,7 @@ RetValWeak nullFuncWeak(int torque, uint period, uint cur_phase, int current){
   return (RetValWeak){ .pwm  = 0, .weak = 0};
 }
 RetValWeak fastMode(int torque, uint period, uint cur_phase, int current){//todo same algorythmus than optweaking but less agressive and more efficient
-  if(pwm>950 && period < 0)
+  if(torque>950 && period < 0)
     return (RetValWeak){ .pwm  = PWM_MAX, .weak = WEAKING_PWM_MAX};
   else
     return (RetValWeak){ .pwm  = torque, .weak = 0};
