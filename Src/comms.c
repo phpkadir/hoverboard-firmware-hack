@@ -4,8 +4,17 @@
 #include "config.h"
 #include "stdio.h"
 #include "string.h"
-
+#include "bldc.h"
+#include "control.h"
 //UART_HandleTypeDef huart2;
+
+const int *virtual_currentlr[] = {currentlr,_buff_curlr};
+const int *virutal_phase[] = {phase_period,_buff_phase};
+const int *virtual_ival[] = {adc_ival,_buff_ival};
+
+int _buff_curlr[2];
+int _buff_phase[2];
+int _buff_ival[2];
 
 #ifdef DEBUG_SERIAL_USART3
 #define UART_DMA_CHANNEL DMA1_Channel2

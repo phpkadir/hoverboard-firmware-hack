@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+int adc_ival[2];
+
 TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;

@@ -11,17 +11,6 @@ uint8_t buzzerPattern = 0;
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
-#define START_FREQ 0
-#define END_FREQ 0
-
-int calcWeakening(int pwm,int freq){ // never used
-  if (freq < START_FREQ) return 0;
-  if (freq >= END_FREQ)
-    return pwm*FEALD_WEAKENING_MAX/100;
-  else
-    return (freq-START_FREQ)*pwm*FEALD_WEAKENING_MAX/100/(END_FREQ-START_FREQ);
-}
-
 const uint8_t hall2pos[2][2][2] = {
   {
     {
@@ -223,7 +212,7 @@ void brushless_countrol(){
       phase_period[x] = timer[x];
       timer[x] = 0;
     } else if(timer[x] > phase_period[x])
-      timer[x] = phase_period[x];
+      phase_period[x] = timer[x];
   }
   blockPhaseCurrent(last_pos[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
   blockPhaseCurrent(last_pos[1], adc_buffer.rr1 - offsetrr1, adc_buffer.rr2 - offsetrr2, &blockcurlr[1]); //Old shitty code

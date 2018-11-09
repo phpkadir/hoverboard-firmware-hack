@@ -51,7 +51,6 @@ uint8_t button1, button2;
 int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
-int mode =2;
 extern uint8_t nunchuck_data[6];
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
@@ -164,34 +163,10 @@ int main(void) {
 
     #define ADC1_DELTA (ADC1_MAX - ADC1_MIN)
     #define ADC2_DELTA (ADC2_MAX - ADC2_MIN)
-
-    if (mode == 1) {  // Mode 1, links: 3 kmh
-      speedRL = (float)speedRL * LOSLASS_BREMS_ACC  // bremsen wenn kein poti gedrueckt
-              - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 280.0f)) * DRUECK_ACC1  // links gedrueckt = zusatzbremsen oder rueckwaertsfahren
-              + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 350.0f)) * DRUECK_ACC2;  // vorwaerts gedrueckt = beschleunigen 12s: 350=3kmh
-
-    } else if (mode == 2) { // Mode 2, default: 6 kmh
-      speedRL = (float)speedRL * LOSLASS_BREMS_ACC
-              - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 310.0f)) * DRUECK_ACC1
-              + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 420.0f)) * DRUECK_ACC2;  // 12s: 400=5-6kmh 450=7kmh
-
-    } else if (mode == 3) { // Mode 3, rechts: 12 kmh
-      speedRL = (float)speedRL * LOSLASS_BREMS_ACC
-              - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 340.0f)) * DRUECK_ACC1
-              + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 600.0f)) * DRUECK_ACC2;  // 12s: 600=12kmh
-
-    } else if (mode == 4) { // Mode 4, l + r: full kmh
-      // Feldschwaechung wird nur aktiviert wenn man schon sehr schnell ist. So gehts: Rechts voll druecken und warten bis man schnell ist, dann zusaetzlich links schnell voll druecken.
-      if (adc1_filtered > (ADC1_MAX - 450) && speedRL > 800) { // field weakening at high speeds
-        speedRL = (float)speedRL * LOSLASS_BREMS_ACC
-              + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 1000.0f)) * DRUECK_ACC2;
-        //weak = weak * 0.95 + 400.0 * 0.05;  // sanftes hinzuschalten des turbos, 12s: 400=29kmh
-      } else { //normale fahrt ohne feldschwaechung
+    
         speedRL = (float)speedRL * LOSLASS_BREMS_ACC
               - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 340.0f)) * DRUECK_ACC1
               + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 1000.0f)) * DRUECK_ACC2;  // 12s: 1000=22kmh
-        //weak = weak * 0.95;  // sanftes abschalten des turbos
-      }
     }
 
     speed = CLAMP(speedRL, -1000, 1000);  // clamp output
