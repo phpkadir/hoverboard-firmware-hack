@@ -7,7 +7,7 @@
 #define DEAD_TIME        32         // PWM deadtime
 #define BAT_CALIB_REAL_VOLTAGE        43.0       // input voltage measured by multimeter  
 #define BAT_CALIB_ADC                 1704       // adc-value measured by mainboard (value nr 5 on UART debug output)
-
+#define DEAD_ZONE 64
 
 #define DC_CUR_LIMIT     25         // Motor DC current limit in amps. it does not disable motors, it is a soft current limit.
 
@@ -111,7 +111,9 @@ else {\
   weakr = 0;
 
 // #define BEEPS_BACKWARD
+#define  PWM_MIN 0
 #define PWM_MAX 1000
+#define PWM_REVERSE_MAX -300
 #define WEAKING_PWM_MAX 450
 // ################################################################################
 

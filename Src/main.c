@@ -210,9 +210,6 @@ int main(void) {
     #endif
     }
 
-    lastSpeedL = speedL;
-    lastSpeedR = speedR;
-
     // ####### LOG TO CONSOLE #######
     consoleScope();
 
@@ -251,6 +248,44 @@ int main(void) {
   }
 }
 
+inline void swp(int* x,int* y){
+	int tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+int calc_median(int x[],int cnt){
+	for(int y=0;y<cnt-1,y++)
+		for(int z=y+1;z<cnt;z++)
+			if(x[y]>x[z])
+				swp(&x[y],&x[z]);
+	if(cnt%2)
+		return x[cnt/2];
+	else
+		return (x[cnt/2]+x[cnt/2+1])/2
+}
+
+int map_analog_pwm(int inval[2]){
+	int tmpval[2]
+	if(inval[1]-DEAD_ZONE-ADC1_MIN<0){
+		if(inval[0]-DEAD_ZONE-ADC1_MIN<0)
+			return PWM_MIN;
+		else if(inval[0]>ADC1_MAX-2*DEAD_ZONE)
+			return PWM_MAX;
+		else
+			return ((inval[0]-DEAD_ZONE-ADC1_MIN)*PWM_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
+	}
+	else if(inval[1]>ADC1_MAX-2*DEAD_ZONE){
+		if(inval[0]-DEAD_ZONE-ADC1_MIN<0)
+			return PWM_MIN;
+		else if(inval[0]>ADC1_MAX-2*DEAD_ZONE)
+			return PWM_REVERSE_MAX;
+		else
+			return ((inval[0]-DEAD_ZONE-ADC1_MIN)*PWM_REVERSE_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
+	}
+	else{
+		return (((inval[2]-DEAD_ZONE-ADC1_MIN)*PWM_REVERSE_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN)-((inval[2]-DEAD_ZONE-ADC1_MIN)*PWM_REVERSE_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
+	}
+}
 /** System Clock Configuration
 */
 void SystemClock_Config(void) {
