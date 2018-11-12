@@ -30,6 +30,7 @@ extern ADC_HandleTypeDef hadc2;
 extern I2C_HandleTypeDef hi2c2;
 extern UART_HandleTypeDef huart2;
 extern volatile adc_buf_t adc_buffer;
+extern volatile const uint16_t *adc_array;
 
 void MX_GPIO_Init(void);
 void MX_TIM_Init(void);

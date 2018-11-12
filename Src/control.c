@@ -121,3 +121,27 @@ void Nunchuck_Read() {
   //setScopeChannel(2, (int)nunchuck_data[5] & 1);
   //setScopeChannel(3, ((int)nunchuck_data[5] >> 1) & 1);
 }
+
+int clean_adc(int inval){
+	if((inval & 0x3FF)-DEAD_ZONE-ADC1_MIN<0)
+    return PWM_MIN;
+	else if((inval & 0x3FF)>ADC1_MAX-2*DEAD_ZONE)
+    return PWM_MAX;
+  else
+	  return (((inval & 0x3FF)-DEAD_ZONE-ADC1_MIN)*PWM_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
+}
+
+inline void calc_torque(int throttle,int breaks,int steering,int* torque){
+  if(breaks == 0){ //forwad
+    torque[0] = throttle+steering;
+    torque[1] = throttle-steering;
+  }
+  else if(breaks == PWM_MAX){ //backwards
+    torque[0] = -throttle+steering;
+    torque[1] = -throttle-steering;
+  }
+  else{
+    torque[0] = torque[1] = 0
+  }
+
+}

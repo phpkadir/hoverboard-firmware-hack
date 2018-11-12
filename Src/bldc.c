@@ -246,6 +246,16 @@ void set_bldc_motors(bool enable){
 
 }
 
+void set_throttle(int left,int right){
+#if defined INVERT_L_DIRECTION
+  throttlelr[0] = -left;
+  throttlelr[1] = right;
+#elif defined INVERT_R_DIRECTION
+  throttlelr[0] = left;
+  throttlelr[1] = -right;
+#endif
+}
+
 //scan 8 channels with 2ADCs @ 20 clk cycles per sample
 //meaning ~80 ADC clock cycles @ 8MHz until new DMA interrupt =~ 100KHz
 //=640 cpu cycles

@@ -10,8 +10,11 @@
 
 const int *virtual_currentlr[] = {currentlr,_buff_curlr};
 const int *virutal_phase[] = {phase_period,_buff_phase};
-const int *virtual_ival[] = {adc_ival,_buff_ival};
-
+#ifdef I2C_MASTER
+const int *virtual_ival[] = {(int*)&adc_array[2],_buff_ival};
+#else
+const int *virtual_ival[] = {_buff_ival,(int*)&adc_array[2]};
+#endif
 const int **sync_vals[] = {virtual_ival,virtual_currentlr,virutal_phase};
 int _buff_curlr[2];
 int _buff_phase[2];

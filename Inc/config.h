@@ -68,35 +68,18 @@
 #define FILTER              0.1  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
 #define SPEED_COEFFICIENT   0.5  // higher value == stronger. 0.0 to 1.0
 #define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
-//#define INVERT_R_DIRECTION
-//#define INVERT_L_DIRECTION
+
+#define INVERT_L_DIRECTION
+#if !defined(INVERT_L_DIRECTION)
+#define INVERT_R_DIRECTION
+#endif // INVERT_R_DIRECTION
+
 
 //Turbo boost at high speeds while button1 is pressed:
-//#define ADDITIONAL_CODE \
-if (button1 && speedR > 700) { /* field weakening at high speeds */ \
-  weakl = cmd1 - 700; /* weak should never exceed 400 or 450 MAX!! */ \
-  weakr = cmd1 - 700; } \
-else { \
-  weakl = 0; \
-  weakr = 0; }
-
 // ###### BOBBYCAR ######
 // #define FILTER              0.1
 // #define SPEED_COEFFICIENT   -1
 // #define STEER_COEFFICIENT   0
-
-// #define ADDITIONAL_CODE \
-if (button1 && speedR < 300) { /* drive backwards */ \
-  speedR = speedR * -0.2f;   \
-  speedL = speedL * -0.2f; } \
-else { \
-  direction = 1; } \
-if (button1 && speedR > 700) { /* field weakening at high speeds */ \
-  weakl = speedR - 600; /* weak should never exceed 400 or 450 MAX!! */ \
-  weakr = speedR - 600; } \
-else { \
-  weakl = 0; \
-  weakr = 0; }
 
 // ###### ARMCHAIR ######
 // #define FILTER              0.05

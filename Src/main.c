@@ -32,10 +32,6 @@ void SystemClock_Config(void);
 
 //LCD_PCF8574_HandleTypeDef lcd;
 
-int cmd1;  // normalized input values. -1000 to 1000
-int cmd2;
-int cmd3;
-
 float adc1_filtered = 0,adc2_filtered = 0;
 
 typedef struct{
@@ -147,7 +143,7 @@ int main(void) {
 
   while(1) {
     HAL_Delay(5);
-
+    virtual_ival[][]
     #ifdef CONTROL_ADC
     // ####### larsm's bobby car code #######
 
@@ -191,23 +187,6 @@ int main(void) {
     #endif
     setScopeChannel(2, (int)speedR);
     setScopeChannel(3, (int)speedL);
-
-    #ifdef ADDITIONAL_CODE
-      ADDITIONAL_CODE;
-    #endif
-
-    // ####### SET OUTPUTS #######
-    if ((speedL < lastSpeedL + 50 && speedL > lastSpeedL - 50) && (speedR < lastSpeedR + 50 && speedR > lastSpeedR - 50) && timeout < TIMEOUT) {
-    #ifdef INVERT_R_DIRECTION
-      throttlelr[1] = speedR;
-    #else
-      throttlelr[1] = -speedR;
-    #endif
-    #ifdef INVERT_L_DIRECTION
-      throttlelr[0] = -speedL;
-    #else
-      throttlelr[0] = speedL;
-    #endif
     }
 
     // ####### LOG TO CONSOLE #######
@@ -262,29 +241,6 @@ int calc_median(int x[],int cnt){
 		return x[cnt/2];
 	else
 		return (x[cnt/2]+x[cnt/2+1])/2
-}
-
-int map_analog_pwm(int inval[2]){
-	int tmpval[2]
-	if(inval[1]-DEAD_ZONE-ADC1_MIN<0){
-		if(inval[0]-DEAD_ZONE-ADC1_MIN<0)
-			return PWM_MIN;
-		else if(inval[0]>ADC1_MAX-2*DEAD_ZONE)
-			return PWM_MAX;
-		else
-			return ((inval[0]-DEAD_ZONE-ADC1_MIN)*PWM_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
-	}
-	else if(inval[1]>ADC1_MAX-2*DEAD_ZONE){
-		if(inval[0]-DEAD_ZONE-ADC1_MIN<0)
-			return PWM_MIN;
-		else if(inval[0]>ADC1_MAX-2*DEAD_ZONE)
-			return PWM_REVERSE_MAX;
-		else
-			return ((inval[0]-DEAD_ZONE-ADC1_MIN)*PWM_REVERSE_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
-	}
-	else{
-		return (((inval[2]-DEAD_ZONE-ADC1_MIN)*PWM_REVERSE_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN)-((inval[2]-DEAD_ZONE-ADC1_MIN)*PWM_REVERSE_MAX-PWM_MIN)/ADC1_MAX-ADC1_MIN+PWM_MIN;
-	}
 }
 /** System Clock Configuration
 */

@@ -3,7 +3,6 @@
 #include "weaking.h"
 extern volatile uint current_limit;
 extern int currentlr[2];
-extern int throttlelr[2];
 extern uint timer[2];
 extern uint8_t last_pos[2];
 extern uint phase_period[2];
@@ -17,3 +16,4 @@ extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1,
 extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
 
 void set_bldc_motors(bool enable);
+void set_throttle(int left,int right);
