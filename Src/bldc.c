@@ -119,13 +119,7 @@ inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
   }
 }
 
-uint16_t offsetrl1   = 2048,
-  offsetrl2   = 2048,
-  offsetrr1   = 2048,
-  offsetrr2   = 2048,
-  offsetdcl   = 2048,
-  offsetdcr   = 2048;
-
+uint16_t adc_offset[6] = {ADC_MID,ADC_MID,ADC_MID,ADC_MID,ADC_MID,ADC_MID}
 volatile unsigned long mainCounter = 0;
 
 volatile float batteryVoltage = 40.0;
@@ -185,12 +179,12 @@ volatile int blockcurlr[2];
 volatile WeakingPtr currentWeaking = nullFuncWeak;
 
 void brushless_countrol(){
-  if((currentlr[0] = ABS(adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
+  if((currentlr[0] = ABS(adc_array[5] - adc_offset[5]) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
   else
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
 
-  if((currentlr[1] = ABS(adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
+  if((currentlr[1] = ABS(adc_array[4] - adc_offset[4]) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
   else
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
@@ -213,9 +207,8 @@ void brushless_countrol(){
       timer[x] = 0;
     } else if(timer[x] > phase_period[x])
       phase_period[x] = timer[x];
+    blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
   }
-  blockPhaseCurrent(last_pos[0], adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &blockcurlr[0]); //Old shitty code
-  blockPhaseCurrent(last_pos[1], adc_buffer.rr1 - offsetrr1, adc_buffer.rr2 - offsetrr2, &blockcurlr[1]); //Old shitty code
 }
 
 typedef void (*IsrPtr)();
@@ -223,17 +216,11 @@ volatile IsrPtr timer_brushless = calibration_func;
 volatile IsrPtr buzzerFunc = nullFunc;
 
 void calibration_func(){
-  if(mainCounter < 1024) {  // calibrate ADC offsets
-    offsetrl1 = (adc_buffer.rl1 + offsetrl1) / 2;
-    offsetrl2 = (adc_buffer.rl2 + offsetrl2) / 2;
-    offsetrr1 = (adc_buffer.rr1 + offsetrr1) / 2;
-    offsetrr2 = (adc_buffer.rr2 + offsetrr2) / 2;
-    offsetdcl = (adc_buffer.dcl + offsetdcl) / 2;
-    offsetdcr = (adc_buffer.dcr + offsetdcr) / 2;
-  }
-  else{
+  if(mainCounter < 1024)  // calibrate ADC offsets
+    for(int x = 0; x < 6; x++)
+      adc_offset[x] = (adc_array[x] + adc_offset[x]) / 2;
+  else
     timer_brushless = brushless_countrol;
-  }
 }
 
 void set_bldc_motors(bool enable){
