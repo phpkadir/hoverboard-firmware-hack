@@ -26,6 +26,7 @@
 #include "bldc.h"  // for the main control variables
 //#include "hd44780.h"  // for the display
 #include "config.h"  // the config
+#include "comms.h"
 #include "control.h"
 
 void SystemClock_Config(void);
@@ -34,25 +35,12 @@ void SystemClock_Config(void);
 
 float adc1_filtered = 0,adc2_filtered = 0;
 
-typedef struct{
-   int16_t steer;
-   int16_t speed;
-   //uint32_t crc;
-} Serialcommand;
-
-volatile Serialcommand command;
-
-uint8_t button1, button2;
-
 int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
-extern uint8_t nunchuck_data[6];
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
-
-int milli_vel_error_sum = 0;
 
 int main(void) {
   HAL_Init();
@@ -99,22 +87,8 @@ int main(void) {
 
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
 
-  int lastSpeedL = 0, lastSpeedR = 0;
-  int speedL = 0, speedR = 0, speedRL = 0;
-  float direction = 1;
-
   #ifdef CONTROL_PPM
     PPM_Init();
-  #endif
-
-  #ifdef CONTROL_NUNCHUCK
-    I2C_Init();
-    Nunchuck_Init();
-  #endif
-
-  #ifdef CONTROL_SERIAL_USART2
-    UART_Control_Init();
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, 4);
   #endif
 
   #ifdef DEBUG_I2C_LCD
@@ -140,57 +114,12 @@ int main(void) {
   #endif
 
   set_bldc_motors(true);
-
+  int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(5);
-    virtual_ival[][]
-    #ifdef CONTROL_ADC
     // ####### larsm's bobby car code #######
-
-    // LOW-PASS FILTER (fliessender Mittelwert)
-    adc1_filtered = adc1_filtered * 0.9 + (float)adc_buffer.l_rx2 * 0.1; // links, rueckwearts
-    adc2_filtered = adc2_filtered * 0.9 + (float)adc_buffer.l_tx2 * 0.1; // rechts, vorwaerts
-
-    // magic numbers die ich nicht mehr nachvollziehen kann, faehrt sich aber gut ;-)
-    #define LOSLASS_BREMS_ACC 0.996f  // naeher an 1 = gemaechlicher
-    #define DRUECK_ACC1 (1.0f - LOSLASS_BREMS_ACC + 0.001f)  // naeher an 0 = gemaechlicher
-    #define DRUECK_ACC2 (1.0f - LOSLASS_BREMS_ACC + 0.001f)  // naeher an 0 = gemaechlicher
-    //die + 0.001f gleichen float ungenauigkeiten aus.
-
-    #define ADC1_DELTA (ADC1_MAX - ADC1_MIN)
-    #define ADC2_DELTA (ADC2_MAX - ADC2_MIN)
-    
-        speedRL = (float)speedRL * LOSLASS_BREMS_ACC
-              - (CLAMP(adc_buffer.l_rx2 - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 340.0f)) * DRUECK_ACC1
-              + (CLAMP(adc_buffer.l_tx2 - ADC2_MIN, 0, ADC2_DELTA) / (ADC2_DELTA / 1000.0f)) * DRUECK_ACC2;  // 12s: 1000=22kmh
-    }
-
-    speed = CLAMP(speedRL, -1000, 1000);  // clamp output
-
-      timeout = 0;
-    #endif
-
-    // ####### LOW-PASS FILTER #######
-    steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
-    speed = speed * (1.0 - FILTER) + cmd2 * FILTER;
-
-
-    // ####### MIXER #######
-    speedR = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
-    speedL = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
-
-
-    // ####### DEBUG SERIAL OUT #######
-    #ifdef CONTROL_ADC
-      setScopeChannel(0, (int)adc_buffer.l_tx2);  // ADC1
-      setScopeChannel(1, (int)adc_buffer.l_rx2);  // ADC2
-    #endif
-    setScopeChannel(2, (int)speedR);
-    setScopeChannel(3, (int)speedL);
-    }
-
-    // ####### LOG TO CONSOLE #######
-    consoleScope();
+    calc_torque(clean_adc(virtual_ival[0][0]),clean_adc(virtual_ival[0][1]),(virtual_ival[1][0] & 0xFFFF)-ADC_MID,tmp_trottle);
+    set_throttle(tmp_trottle[0],tmp_trottle[1]);
 
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
       set_bldc_motors(false);
