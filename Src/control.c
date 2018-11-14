@@ -139,7 +139,7 @@ inline void calc_torque(int throttle,int breaks,int steering,int* torque){
     torque[1] = -throttle-steering;
   }
   else{
-    torque[0] = torque[1] = 0
+    torque[0] = torque[1] = 0;
   }
 
 }

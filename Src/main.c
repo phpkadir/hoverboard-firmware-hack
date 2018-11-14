@@ -162,14 +162,14 @@ inline void swp(int* x,int* y){
 	*y = tmp;
 }
 int calc_median(int x[],int cnt){
-	for(int y=0;y<cnt-1,y++)
-		for(int z=y+1;z<cnt;z++)
+	for(int y=0;y<cnt-1; y++)
+		for(int z=y+1;z<cnt; z++)
 			if(x[y]>x[z])
 				swp(&x[y],&x[z]);
 	if(cnt%2)
 		return x[cnt/2];
 	else
-		return (x[cnt/2]+x[cnt/2+1])/2
+		return (x[cnt/2]+x[cnt/2+1])/2;
 }
 /** System Clock Configuration
 */

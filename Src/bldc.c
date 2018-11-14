@@ -126,7 +126,7 @@ uint16_t adc_offset[6] = {
   ADC_MID,
   ADC_MID,
   ADC_MID
-}
+};
 volatile unsigned long mainCounter = 0;
 
 volatile float batteryVoltage = 40.0;

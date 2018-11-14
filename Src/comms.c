@@ -8,17 +8,17 @@
 #include "control.h"
 //UART_HandleTypeDef huart2;
 
-const int *virtual_currentlr[] = {currentlr,_buff_curlr};
-const int *virutal_phase[] = {phase_period,_buff_phase};
-#ifdef I2C_MASTER
-const int *virtual_ival[] = {(int*)&adc_array[2],_buff_ival};
-#else
-const int *virtual_ival[] = {_buff_ival,(int*)&adc_array[2]};
-#endif
-const int **sync_vals[] = {virtual_ival,virtual_currentlr,virutal_phase};
 int _buff_curlr[2];
 int _buff_phase[2];
 int _buff_ival[2];
+const int *virtual_currentlr[] = {currentlr,_buff_curlr};
+const int *virutal_phase[] = {phase_period,_buff_phase};
+#ifdef I2C_MASTER
+const int *virtual_ival[] = {(int*)&(adc_array[2]),_buff_ival};
+#else
+const int *virtual_ival[] = {_buff_ival,(int*)&(adc_array[2])};
+#endif
+const int **sync_vals[] = {virtual_ival,virtual_currentlr,virutal_phase};
 
 #ifdef DEBUG_SERIAL_USART3
 #define UART_DMA_CHANNEL DMA1_Channel2

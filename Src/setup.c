@@ -48,7 +48,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 volatile adc_buf_t adc_buffer;
-const volatile uint16_t *adc_array = &adc_buffer;
+volatile const uint16_t *adc_array = &adc_buffer;
 
 
 #ifdef CONTROL_SERIAL_USART2
