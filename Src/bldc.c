@@ -144,7 +144,7 @@ void set_motor_l(int *hPhase){
   LEFT_TIM->LEFT_TIM_V = CLAMP(hPhase[1] + pwm_res / 2, 10, pwm_res-10);
   LEFT_TIM->LEFT_TIM_W = CLAMP(hPhase[2] + pwm_res / 2, 10, pwm_res-10);
 }
-setMotorType set_motor[2] = { //array for loop
+const setMotorType set_motor[2] = { //array for loop
   set_motor_l,
   set_motor_r
 };
@@ -159,9 +159,28 @@ uint8_t get_pos_r(){
       [!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
 }
 typedef uint8_t (*getPosType)();
-getPosType get_pos[2]={
+const getPosType get_pos[2]={
   get_pos_l,
   get_pos_r
+};
+
+typedef void (*SetBoolFunc)(bool enable);
+void set_tim_l(bool enable){
+  if(enable)
+    LEFT_TIM->BDTR |= TIM_BDTR_MOE;
+  else
+    LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
+}
+void set_tim_r(bool enable){
+  if(enable)
+    RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
+  else
+    RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
+}
+
+SetBoolFunc set_tim_lr[2] = {
+  set_tim_l,
+  set_tim_r
 };
 
 void calibration_func();
@@ -186,20 +205,12 @@ volatile int blockcurlr[2];
 volatile WeakingPtr currentWeaking = nullFuncWeak;
 
 void brushless_countrol(){
-  if((currentlr[0] = ABS(adc_array[5] - adc_offset[5]) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
-    LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
-  else
-    LEFT_TIM->BDTR |= TIM_BDTR_MOE;
-
-  if((currentlr[1] = ABS(adc_array[4] - adc_offset[4]) * MOTOR_AMP_CONV_DC_AMP) > current_limit || timeout > TIMEOUT)
-    RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
-  else
-    RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
   //PWM part
   int phase[3];
   int wphase[3];
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
+    set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     uint8_t pos = get_pos[x];
     RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
     blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
