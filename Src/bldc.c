@@ -204,7 +204,7 @@ volatile int blockcurlr[2];
 
 volatile WeakingPtr currentWeaking = nullFuncWeak;
 
-void brushless_countrol(){
+void sensored_brushless_countrol(){
   //PWM part
   int phase[3];
   int wphase[3];
@@ -212,6 +212,31 @@ void brushless_countrol(){
   for(int x = 0; x < 2; x++){
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     uint8_t pos = get_pos[x];
+    RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
+    blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
+    blockPWM(tmp.weak, (pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
+    for(int y = 0; y < 3; y++)
+      phase[y] += wphase[y];
+    set_motor[x](phase);
+    //speed measurung
+    timer[x]++;
+    if(last_pos[x]!=pos){
+      phase_period[x] = timer[x];
+      timer[x] = 0;
+    } else if(timer[x] > phase_period[x])
+      phase_period[x] = timer[x];
+    blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
+  }
+}
+
+void sensorless_brushless_countrol(){  // TODO: Only currentdriven control because the suckers doesnt have the voltage sensors
+  //PWM part
+  int phase[3];
+  int wphase[3];
+  //update PWM channels based on position
+  for(int x = 0; x < 2; x++){
+    set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
+    uint8_t pos = get_pos[x];  // needs to be calced
     RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
     blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
     blockPWM(tmp.weak, (pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
@@ -238,13 +263,13 @@ void calibration_func(){
     for(int x = 0; x < 6; x++)
       adc_offset[x] = (adc_array[x] + adc_offset[x]) / 2;
   else
-    timer_brushless = brushless_countrol;
+    timer_brushless = sensored_brushless_countrol;
 }
 
 void set_bldc_motors(bool enable){
   if(timer_brushless != calibration_func){
     if(enable)
-      timer_brushless = brushless_countrol;
+      timer_brushless = sensored_brushless_countrol;
     else
       timer_brushless = nullFunc;
   }

@@ -118,7 +118,9 @@ int main(void) {
   while(1) {
     HAL_Delay(5);
     // ####### larsm's bobby car code #######
-    calc_torque(clean_adc(virtual_ival[0][0]),clean_adc(virtual_ival[0][1]),(virtual_ival[1][0] & 0xFFFF)-ADC_MID,tmp_trottle);
+    //calc_torque(clean_adc(virtual_ival[0][0]),clean_adc(virtual_ival[0][1]),(virtual_ival[1][0] & 0xFFFF)-ADC_MID,tmp_trottle);
+    tmp_trottle[0] = CLAMP(((virtual_ival[0][0] & 0xFFFF) - ADC_MID)/2,-1000,1000);
+    tmp_trottle[1] = CLAMP(((virtual_ival[0][1] & 0xFFFF) - ADC_MID)/2,-1000,1000);
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
 
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
