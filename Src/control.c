@@ -122,19 +122,19 @@ void Nunchuck_Read() {
 
 int clean_adc(int inval){
 	if((inval & 0x3FF)-DEAD_ZONE-ADC_MIN<0)
-    return PWM_MIN;
+    return PWM_MIN;  // if ival in under deadzone
 	else if((inval & 0x3FF)>ADC_MAX-2*DEAD_ZONE)
-    return PWM_MAX;
+    return PWM_MAX;  // if ival in upper deadzone
   else
-	  return (((inval & 0x3FF)-DEAD_ZONE-ADC_MIN)*PWM_MAX-PWM_MIN)/ADC_MAX-ADC_MIN+PWM_MIN;
+	  return (((inval & 0x3FF)-DEAD_ZONE-ADC_MIN)*PWM_MAX-PWM_MIN)/ADC_MAX-ADC_MIN+PWM_MIN;  // Map value linear to area in PWM area
 }
 
 inline void calc_torque(int throttle,int breaks,int steering,int* torque){
-  if(breaks == 0){ //forwad
+  if(breaks == 0){  // drive forward
     torque[0] = throttle+steering;
     torque[1] = throttle-steering;
   }
-  else if(breaks == PWM_MAX){ //backwards
+  else if(breaks == PWM_MAX){  // drive backwards
     torque[0] = -throttle+steering;
     torque[1] = -throttle-steering;
   }
