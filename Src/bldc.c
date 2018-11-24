@@ -185,7 +185,8 @@ SetBoolFunc set_tim_lr[2] = {
 
 void calibration_func();
 
-void nullFunc(){}
+void nullFunc(){}  // Function for empty funktionpointer becasue Jump NULL != ret
+
 void oldBuzzer(){
   if (buzzerFreq != 0 && (mainCounter / 5000) % (buzzerPattern + 1) == 0) {
     if (mainCounter % buzzerFreq == 0)
@@ -230,7 +231,8 @@ void sensored_brushless_countrol(){
   }
 }
 uint8_t nextPos(uint8_t oldpos, bool forward){
-  return ((uint8_t)(forward ? oldpos + 1 : oldpos - 1) & 0x7);
+	uint8_t tmp = ((uint8_t)(forward ? oldpos + 1 : oldpos - 1) & 0x7)
+  return tmp < 6 ? tmp : 0;
 }
 
 void sensorless_brushless_countrol(){  // TODO: Only currentdriven control because the suckers doesnt have the voltage sensors
