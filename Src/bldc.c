@@ -178,7 +178,7 @@ void set_tim_r(bool enable){
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
 }
 
-SetBoolFunc set_tim_lr[2] = {
+const SetBoolFunc set_tim_lr[2] = {
   set_tim_l,
   set_tim_r
 };
@@ -187,7 +187,7 @@ void calibration_func();
 
 void nullFunc(){}  // Function for empty funktionpointer becasue Jump NULL != ret
 
-void oldBuzzer(){
+void oldBuzzer(){  // buzzer for creating sounds
   if (buzzerFreq != 0 && (mainCounter / 5000) % (buzzerPattern + 1) == 0) {
     if (mainCounter % buzzerFreq == 0)
       HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
@@ -195,15 +195,15 @@ void oldBuzzer(){
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
   }
 }
-volatile uint current_limit;
-volatile int currentlr[2];
-volatile int throttlelr[2];
-volatile uint timer[2];
-volatile uint8_t last_pos[2];
-volatile uint phase_period[2];
-volatile int blockcurlr[2];
+volatile uint current_limit;  // dynamic Currentlimit
+volatile int currentlr[2];  // Current for cutoff
+volatile int throttlelr[2];  // throttle for calcing pwm and weakening
+volatile uint timer[2];  // timer for speed measuring
+volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
+volatile uint phase_period[2];  // the measured speed in 1/x
+volatile int blockcurlr[2];  // Current for sensorles bldc
 
-volatile WeakingPtr currentWeaking = nullFuncWeak;
+volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
 void sensored_brushless_countrol(){
   //PWM part
@@ -230,8 +230,10 @@ void sensored_brushless_countrol(){
     blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
   }
 }
+
+//Sensorless Control
 uint8_t nextPos(uint8_t oldpos, bool forward){
-	uint8_t tmp = ((uint8_t)(forward ? oldpos + 1 : oldpos - 1) & 0x7)
+	uint8_t tmp = ((uint8_t)(forward ? oldpos + 1 : oldpos - 1) & 0x7);
   return tmp < 6 ? tmp : 0;
 }
 
@@ -241,6 +243,7 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
   int wphase[3];
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
+    uint8_t pos;
     int tmp_phase_current;
     blockPhaseCurrent(last_pos[x],
       adc_array[3-2*x] - adc_offset[3-2*x],
@@ -248,7 +251,9 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
       &tmp_phase_current);  // Block Phase current for sensorless bldc control
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     if(tmp_phase_current < blockcurlr[x])  // check for an phase change TODO need an goot algorythom
-      uint8_t pos = nextPos(last_pos[x], throttlelr > 0);  // needs to be calced
+      pos = nextPos(last_pos[x], throttlelr > 0);  // needs to be calced
+    else
+      pos = last_pos[x];
     RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
     blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
     blockPWM(tmp.weak, (pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
@@ -265,7 +270,7 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
       phase_period[x] = timer[x];
   }
 }
-
+//end Sensorless Control
 typedef void (*IsrPtr)();
 volatile IsrPtr timer_brushless = calibration_func;
 volatile IsrPtr buzzerFunc = nullFunc;
