@@ -128,7 +128,15 @@ int clean_adc(int inval){
   else
 	  return (((inval & 0x3FF)-DEAD_ZONE-ADC_MIN)*PWM_MAX-PWM_MIN)/ADC_MAX-ADC_MIN+PWM_MIN;  // Map value linear to area in PWM area
 }
+float steering_eagle;
+float torque_car;
+float length;
+float width;
+float wheel_fl,wheel_fr,wheel_bl,wheel_br;
+void calc_torque_per_wheel(){
+  torque_car = (wheel_fl + wheel_fr + wheel_bl + wheel_br) / 4;
 
+}
 inline void calc_torque(int throttle,int breaks,int steering,int* torque){
   if(breaks == 0){  // drive forward
     torque[0] = throttle+steering;
