@@ -137,7 +137,7 @@ float wheel_fl,wheel_fr,wheel_bl,wheel_br;
 void calc_torque_per_wheel(){
 //  torque_car = (wheel_fl + wheel_fr + wheel_bl + wheel_br) / 4;
   float back_wheel = length / tan(abs(steering_eagle));
-#if defined(FRONT)
+#if !defined(STEERING)
   wheel_bl = back_wheel + width/2 * SIGN(steering_eagle);
   wheel_br = back_wheel - width/2 * SIGN(steering_eagle);
 #else
