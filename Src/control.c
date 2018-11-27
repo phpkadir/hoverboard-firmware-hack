@@ -133,9 +133,17 @@ float torque_car;
 float length;
 float width;
 float wheel_fl,wheel_fr,wheel_bl,wheel_br;
+#define STEERING_TO_WHEEL_DIST 1
 void calc_torque_per_wheel(){
-  torque_car = (wheel_fl + wheel_fr + wheel_bl + wheel_br) / 4;
-
+//  torque_car = (wheel_fl + wheel_fr + wheel_bl + wheel_br) / 4;
+  float back_wheel = length / tan(abs(steering_eagle));
+#if defined(FRONT)
+  wheel_bl = back_wheel + width/2 * SIGN(steering_eagle);
+  wheel_br = back_wheel - width/2 * SIGN(steering_eagle);
+#else
+  wheel_fl = sqrt(pow(wheel_bl - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle),2)+pow(length,2)) + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
+  wheel_fr = sqrt(pow(wheel_br + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle),2)+pow(length,2)) - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
+#endif
 }
 inline void calc_torque(int throttle,int breaks,int steering,int* torque){
   if(breaks == 0){  // drive forward
