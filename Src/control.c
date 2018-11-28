@@ -147,17 +147,15 @@ inline void calc_torque_per_wheel(int throttle, float steering_eagle, int* torqu
   #undef wheel_br
 #endif
 }
-inline void calc_torque(int throttle,int breaks,int steering,int* torque){
+int calc_torque(int throttle,int breaks){
   if(breaks == 0){  // drive forward
-    torque[0] = throttle+steering;
-    torque[1] = throttle-steering;
-  }
+    return throttle;
+}
   else if(breaks == PWM_MAX){  // drive backwards
-    torque[0] = -throttle+steering;
-    torque[1] = -throttle-steering;
+    return -throttle
   }
   else{
-    torque[0] = torque[1] = 0;
+    return = 0;
   }
 
 }
