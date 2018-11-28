@@ -132,17 +132,19 @@ int clean_adc(int inval){
 #define WHEELBASE 2
 #define WHEEL_WIDTH 1
 #define STEERING_TO_WHEEL_DIST 1
-inline void calc_torque_per_wheel(int torque_car, float steering_eagle, int* wheel_torque){
-//  torque_car = (wheel_fl + wheel_fr + wheel_bl + wheel_br) / 4;
+inline void calc_torque_per_wheel(int throttle, float steering_eagle, int* torque){
   int back_wheel = WHEELBASE / tan(abs(steering_eagle));
+  int radius_main = sqrt(pow(back_wheel, 2)+pow(WHEELBASE / 2 ,2));
 #if !defined(STEERING)
-  wheel_torque[0] = back_wheel + WHEEL_WIDTH/2 * SIGN(steering_eagle);
-  wheel_torque[1] = back_wheel - WHEEL_WIDTH/2 * SIGN(steering_eagle);
+  torque[0] = (back_wheel + WHEEL_WIDTH/2 * sign(steering_eagle)) * throttle / radius_main;
+  torque[1] = (back_wheel - WHEEL_WIDTH/2 * sign(steering_eagle)) * throttle / radius_main;
 #else
-  float wheel_bl = back_wheel + (WHEEL_WIDTH/2 * SIGN(steering_eagle) - STEERING_TO_WHEEL_DIST);
-  float wheel_br = back_wheel - (WHEEL_WIDTH/2 * SIGN(steering_eagle) - STEERING_TO_WHEEL_DIST);
-  wheel_torque[0] = sqrt(pow(wheel_bl, 2)+pow(WHEELBASE,2)) + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
-  wheel_torque[1] = sqrt(pow(wheel_br, 2)+pow(WHEELBASE,2)) - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
+  #define wheel_bl (back_wheel + (WHEEL_WIDTH/2 * sign(steering_eagle) - STEERING_TO_WHEEL_DIST))
+  #define wheel_br (back_wheel - (WHEEL_WIDTH/2 * sign(steering_eagle) - STEERING_TO_WHEEL_DIST))
+  torque[0] = (sqrt(pow(wheel_bl, 2)+pow(WHEELBASE,2)) + STEERING_TO_WHEEL_DIST * sign(steering_eagle)) * throttle / radius_main;
+  torque[1] = (sqrt(pow(wheel_br, 2)+pow(WHEELBASE,2)) - STEERING_TO_WHEEL_DIST * sign(steering_eagle)) * throttle / radius_main;
+  #undef wheel_bl
+  #undef wheel_br
 #endif
 }
 inline void calc_torque(int throttle,int breaks,int steering,int* torque){
