@@ -126,7 +126,7 @@ int clean_adc(int inval){
 	else if((inval & 0x3FF)>ADC_MAX-2*DEAD_ZONE)
     return PWM_MAX;  // if ival in upper deadzone
   else
-	  return (((inval & 0x3FF)-DEAD_ZONE-ADC_MIN)*PWM_MAX-PWM_MIN)/ADC_MAX-ADC_MIN+PWM_MIN;  // Map value linear to area in PWM area
+	  return (((inval & 0x3FF) - DEAD_ZONE - ADC_MIN) * (PWM_MAX - PWM_MIN)) / (ADC_MAX - ADC_MIN) + PWM_MIN;  // Map value linear to area in PWM area
 }
 
 #define WHEELBASE 2
