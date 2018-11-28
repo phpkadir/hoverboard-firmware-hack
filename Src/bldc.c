@@ -295,14 +295,14 @@ void set_bldc_motors(bool enable){
 
 void set_throttle(int left,int right){  // get set access for the throttle and switchin the direction of one motor
 #if defined(INVERT_L_DIRECTION)
-  throttlelr[0] = -left;
+  throttlelr[0] = CLAMP(-left,-1000,1000);
 #else
-  throttlelr[0] = left;
+  throttlelr[0] = CLAMP(left,-1000,1000);
 #endif
 #if defined(INVERT_R_DIRECTION)
-  throttlelr[1] = -right;
+  throttlelr[1] = CLAMP(-right,-1000,1000);
 #else
-  throttlelr[1] = right;
+  throttlelr[1] = CLAMP(right,-1000,1000);
 #endif
 }
 

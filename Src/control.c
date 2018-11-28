@@ -152,10 +152,10 @@ int calc_torque(int throttle,int breaks){
     return throttle;
 }
   else if(breaks == PWM_MAX){  // drive backwards
-    return -throttle
+    return -throttle;
   }
   else{
-    return = 0;
+    return 0;
   }
 
 }
