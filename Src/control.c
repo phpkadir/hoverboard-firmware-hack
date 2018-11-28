@@ -128,6 +128,7 @@ int clean_adc(int inval){
   else
 	  return (((inval & 0x3FF)-DEAD_ZONE-ADC_MIN)*PWM_MAX-PWM_MIN)/ADC_MAX-ADC_MIN+PWM_MIN;  // Map value linear to area in PWM area
 }
+
 #define WHEELBASE 2
 #define WHEEL_WIDTH 1
 #define STEERING_TO_WHEEL_DIST 1
