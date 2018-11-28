@@ -128,21 +128,20 @@ int clean_adc(int inval){
   else
 	  return (((inval & 0x3FF)-DEAD_ZONE-ADC_MIN)*PWM_MAX-PWM_MIN)/ADC_MAX-ADC_MIN+PWM_MIN;  // Map value linear to area in PWM area
 }
-float steering_eagle;
-float torque_car;
-float length;
-float width;
-float wheel_fl,wheel_fr,wheel_bl,wheel_br;
+#define WHEELBASE 2
+#define WHEEL_WIDTH 1
 #define STEERING_TO_WHEEL_DIST 1
-void calc_torque_per_wheel(){
+inline void calc_torque_per_wheel(int torque_car, float steering_eagle, int* wheel_torque){
 //  torque_car = (wheel_fl + wheel_fr + wheel_bl + wheel_br) / 4;
-  float back_wheel = length / tan(abs(steering_eagle));
+  int back_wheel = WHEELBASE / tan(abs(steering_eagle));
 #if !defined(STEERING)
-  wheel_bl = back_wheel + width/2 * SIGN(steering_eagle);
-  wheel_br = back_wheel - width/2 * SIGN(steering_eagle);
+  wheel_torque[0] = back_wheel + WHEEL_WIDTH/2 * SIGN(steering_eagle);
+  wheel_torque[1] = back_wheel - WHEEL_WIDTH/2 * SIGN(steering_eagle);
 #else
-  wheel_fl = sqrt(pow(wheel_bl - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle),2)+pow(length,2)) + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
-  wheel_fr = sqrt(pow(wheel_br + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle),2)+pow(length,2)) - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
+  float wheel_bl = back_wheel + (WHEEL_WIDTH/2 * SIGN(steering_eagle) - STEERING_TO_WHEEL_DIST);
+  float wheel_br = back_wheel - (WHEEL_WIDTH/2 * SIGN(steering_eagle) - STEERING_TO_WHEEL_DIST);
+  wheel_torque[0] = sqrt(pow(wheel_bl, 2)+pow(WHEELBASE,2)) + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
+  wheel_torque[1] = sqrt(pow(wheel_br, 2)+pow(WHEELBASE,2)) - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle);
 #endif
 }
 inline void calc_torque(int throttle,int breaks,int steering,int* torque){
