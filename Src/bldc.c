@@ -205,6 +205,17 @@ volatile int blockcurlr[2];  // Current for sensorles bldc
 
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
+uint8_t next_pos(uint8_t oldpos, int8_t direction){
+  switch(direction){
+    case -1:
+      return (oldpos - 1) == -1 ? 5 : (oldpos - 1);
+    case 1:
+      return (oldpos + 1) == 6 ? 0 : (oldpos + 1);
+    default
+      return oldpos;
+  }
+}
+
 void sensored_brushless_countrol(){
   //PWM part
   int phase[3];
@@ -212,19 +223,25 @@ void sensored_brushless_countrol(){
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
-    uint8_t pos = get_pos[x];
+    uint8_t timing_pos, real_pos = get_pos[x];
+#if defined(TIMING) && TIMING > 0
+    if(calc_timing(phase_period[x],timer[x],throttlelr[x]))
+      timing_pos = next_pos(real_pos,SIGN(throttlelr[x]));
+    else
+#endif
+     timing_pos = real_pos; 
     RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
-    blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
-    blockPWM(tmp.weak, (pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
+    blockPWM(tmp.pwm, timing_pos, &phase[0], &phase[1], &phase[2]);
+    blockPWM(tmp.weak, (timing_pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
     for(int y = 0; y < 3; y++)
       phase[y] += wphase[y];
     set_motor[x](phase);
     //speed measurung
     timer[x]++;
-    if(last_pos[x]!=pos){
+    if(last_pos[x]!=real_pos){
       phase_period[x] = timer[x];
       timer[x] = 0;
-      last_pos[x] = pos;
+      last_pos[x] = real_pos;
     } else if(timer[x] > phase_period[x])
       phase_period[x] = timer[x];
     blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
@@ -232,10 +249,6 @@ void sensored_brushless_countrol(){
 }
 
 //Sensorless Control
-uint8_t nextPos(uint8_t oldpos, bool forward){
-	uint8_t tmp = ((uint8_t)(forward ? oldpos + 1 : oldpos - 1) & 0x7);
-  return tmp < 6 ? tmp : 0;
-}
 
 void sensorless_brushless_countrol(){  // TODO: Only currentdriven control because the suckers doesnt have the voltage sensors
   //PWM part
@@ -251,7 +264,7 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
       &tmp_phase_current);  // Block Phase current for sensorless bldc control
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     if(tmp_phase_current < blockcurlr[x])  // check for an phase change TODO need an goot algorythom
-      pos = nextPos(last_pos[x], throttlelr > 0);  // needs to be calced
+      pos = next_pos(last_pos[x], SIGN(throttlelr[x]));  // needs to be calced
     else
       pos = last_pos[x];
     RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);

@@ -34,6 +34,9 @@ void set_weaking(int x){
   currentWeaking = weakfunctions[x].func;
   current_limit = weakfunctions[x].cur_limit;
 }
+bool calc_timing(int lst_phase, int cur_phase, int throttle){
+  return false;
+}
 const char* get_weaking_name(int x){
   return weakfunctions[x].name;
 }
