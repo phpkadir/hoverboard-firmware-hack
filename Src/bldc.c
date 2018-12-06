@@ -211,7 +211,7 @@ uint8_t next_pos(uint8_t oldpos, int8_t direction){
       return (oldpos - 1) == -1 ? 5 : (oldpos - 1);
     case 1:
       return (oldpos + 1) == 6 ? 0 : (oldpos + 1);
-    default
+    default:
       return oldpos;
   }
 }
@@ -229,10 +229,18 @@ void sensored_brushless_countrol(){
       timing_pos = next_pos(real_pos,SIGN(throttlelr[x]));
     else
 #endif
-     timing_pos = real_pos; 
+    timing_pos = real_pos; 
     RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
-    blockPWM(tmp.pwm, timing_pos, &phase[0], &phase[1], &phase[2]);
-    blockPWM(tmp.weak, (timing_pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
+    blockPWM(tmp.pwm,
+      timing_pos,
+      &phase[0],
+      &phase[1],
+      &phase[2]);
+    blockPWM(tmp.weak,
+      (timing_pos + (tmp.pwm > 0 ? 5 : 1)) % 6,
+      &wphase[0],
+      &wphase[1],
+      &wphase[2]);
     for(int y = 0; y < 3; y++)
       phase[y] += wphase[y];
     set_motor[x](phase);
