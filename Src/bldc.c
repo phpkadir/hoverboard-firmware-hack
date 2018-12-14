@@ -11,7 +11,7 @@ uint8_t buzzerPattern = 0;
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
-const uint8_t hall2pos[2][2][2] = {
+const uint8_t hall2pos[2][2][2] = {  // unchecked
   {
     {
       2,
@@ -34,7 +34,7 @@ const uint8_t hall2pos[2][2][2] = {
   }
 };
 
-inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
+inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {  // checked working
   switch(pos) {
     case 0:
       *u = 0;
@@ -73,7 +73,7 @@ inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {
   }
 }
 
-inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
+inline void blockPhaseCurrent(int pos, int u, int v, int *q) {  // unknown
   switch(pos) {
     case 0:
       *q = u - v;
@@ -119,7 +119,7 @@ inline void blockPhaseCurrent(int pos, int u, int v, int *q) {
   }
 }
 
-uint16_t adc_offset[6] = {
+uint16_t adc_offset[6] = {  // offests as array for looping adc
   ADC_MID,
   ADC_MID,
   ADC_MID,
@@ -127,9 +127,9 @@ uint16_t adc_offset[6] = {
   ADC_MID,
   ADC_MID
 };
-volatile unsigned long mainCounter = 0;
+volatile unsigned long mainCounter = 0;  // global time incremented by interrupt
 
-volatile float batteryVoltage = 40.0;
+volatile float batteryVoltage = 40.0;  // measured batvoltage as float TODO: use int
 
 const int max_time = PWM_FREQ / 10; // never used
 
@@ -178,12 +178,10 @@ void set_tim_r(bool enable){
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
 }
 
-const SetBoolFunc set_tim_lr[2] = {
+const SetBoolFunc set_tim_lr[2] = {  // disable/enable motors
   set_tim_l,
   set_tim_r
 };
-
-void calibration_func();
 
 void nullFunc(){}  // Function for empty funktionpointer becasue Jump NULL != ret
 
@@ -205,6 +203,8 @@ volatile int blockcurlr[2];  // Current for sensorles bldc
 
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
+volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the timing of the motor (to prebuild the electric fields)
+
 uint8_t next_pos(uint8_t oldpos, int8_t direction){
   switch(direction){
     case -1:
@@ -224,13 +224,17 @@ void sensored_brushless_countrol(){
   for(int x = 0; x < 2; x++){
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     uint8_t timing_pos, real_pos = get_pos[x];
-#if defined(TIMING) && TIMING > 0
-    if(calc_timing(phase_period[x],timer[x],throttlelr[x]))
-      timing_pos = next_pos(real_pos,SIGN(throttlelr[x]));
+    if(currentTiming(phase_period[x],
+        timer[x],
+        throttlelr[x]))
+      timing_pos = next_pos(real_pos,
+        SIGN(throttlelr[x]));
     else
-#endif
-    timing_pos = real_pos; 
-    RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
+      timing_pos = real_pos;  // ifdef true end else else its always calced
+    RetValWeak tmp = currentWeaking(throttlelr[x],
+      phase_period[x],
+      timer[x],
+      currentlr[x]);
     blockPWM(tmp.pwm,
       timing_pos,
       &phase[0],
@@ -292,6 +296,9 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
   }
 }
 //end Sensorless Control
+
+void calibration_func();  // for correct var accessing and do not set to public
+
 typedef void (*IsrPtr)();
 volatile IsrPtr timer_brushless = calibration_func;
 volatile IsrPtr buzzerFunc = nullFunc;
@@ -315,7 +322,7 @@ void set_bldc_motors(bool enable){
 }
 
 void set_throttle(int left,int right){  // get set access for the throttle and switchin the direction of one motor
-#if defined(INVERT_L_DIRECTION)
+#if defined(INVERT_L_DIRECTION)  // for other hardware needs this function to be rewritten
   throttlelr[0] = CLAMP(-left,-1000,1000);
 #else
   throttlelr[0] = CLAMP(left,-1000,1000);
