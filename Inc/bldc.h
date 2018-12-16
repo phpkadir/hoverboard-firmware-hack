@@ -6,7 +6,7 @@ extern volatile unsigned int current_limit;
 extern int currentlr[2];
 extern unsigned int timer[2];
 extern uint8_t last_pos[2];
-extern unsigned int phase_period[2];
+extern int phase_period[2];
 extern int blockcurlr[2];
 
 extern float batteryVoltage;

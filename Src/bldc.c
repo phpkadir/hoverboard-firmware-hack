@@ -195,7 +195,7 @@ void oldBuzzer(){  // buzzer for creating sounds
   }
 }
 
-volatile unsigned int phase_period[2];  // the measured speed in 1/x
+volatile int phase_period[2];  // the measured speed in 1/x
 
 typedef void (*SetPhaseType)(int phase);
 void set_phase_l(int phase){
@@ -224,7 +224,7 @@ volatile int throttlelr[2];  // throttle for calcing pwm and weakening
 volatile unsigned int timer[2];  // timer for speed measuring
 volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
 volatile int blockcurlr[2];  // Current for sensorles bldc
-volatile unsigned int internal_phase_period[2];
+volatile int internal_phase_period[2];
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
 volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the timing of the motor (to prebuild the electric fields)
