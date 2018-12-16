@@ -224,7 +224,7 @@ volatile int throttlelr[2];  // throttle for calcing pwm and weakening
 volatile unsigned int timer[2];  // timer for speed measuring
 volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
 volatile int blockcurlr[2];  // Current for sensorles bldc
-
+volatile unsigned int internal_phase_period[2];
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
 volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the timing of the motor (to prebuild the electric fields)
@@ -248,7 +248,7 @@ void sensored_brushless_countrol(){
   for(int x = 0; x < 2; x++){
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     uint8_t timing_pos, real_pos = get_pos[x];
-    if(currentTiming(phase_period[x],
+    if(currentTiming(internal_phase_period[x],
         timer[x],
         throttlelr[x]))
       timing_pos = next_pos(real_pos,
@@ -256,7 +256,7 @@ void sensored_brushless_countrol(){
     else
       timing_pos = real_pos;  // ifdef true end else else its always calced
     RetValWeak tmp = currentWeaking(throttlelr[x],
-      phase_period[x],
+      internal_phase_period[x],
       timer[x],
       currentlr[x]);
     blockPWM(tmp.pwm,
@@ -276,13 +276,13 @@ void sensored_brushless_countrol(){
     timer[x]++;
     if(last_pos[x] != real_pos){
       if(next_pos(last_pos[x],1) == real_pos)
-        set_phase_lr[x](timer[x]);
+        set_phase_lr[x](internal_phase_period[x] = timer[x]);
       else
-        set_phase_lr[x](-timer[x]);
+        set_phase_lr[x](internal_phase_period[x] = -timer[x]);
       timer[x] = 0;
       last_pos[x] = real_pos;
-    } else if(timer[x] > abs(phase_period[x]))
-      set_phase_lr[x](SIGN(phase_period[x])*timer[x]);
+    } else if(timer[x] > abs(internal_phase_period[x]))
+      set_phase_lr[x](internal_phase_period[x] = SIGN(internal_phase_period[x])*timer[x]);
     blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
   }
 }
