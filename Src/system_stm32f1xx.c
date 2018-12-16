@@ -73,7 +73,8 @@
 /** @addtogroup STM32F1xx_System_Private_Includes
   * @{
   */
-
+#include <stdbool.h>
+#include <stdint.h>
 #include "stm32f1xx.h"
 
 /**

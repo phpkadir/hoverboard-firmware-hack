@@ -34,7 +34,8 @@ BAT   PC2 CH12   L_RX PA3 CH03
 
 pb10 usart3 dma1 channel2/3
 */
-
+#include <stdbool.h>
+#include <stdint.h>
 #include "defines.h"
 #include "config.h"
 

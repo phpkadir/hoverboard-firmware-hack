@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 #include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"
@@ -193,12 +194,12 @@ void oldBuzzer(){  // buzzer for creating sounds
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
   }
 }
-volatile uint current_limit;  // dynamic Currentlimit
+volatile unsigned int current_limit;  // dynamic Currentlimit
 volatile int currentlr[2];  // Current for cutoff
 volatile int throttlelr[2];  // throttle for calcing pwm and weakening
-volatile uint timer[2];  // timer for speed measuring
+volatile unsigned int timer[2];  // timer for speed measuring
 volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
-volatile uint phase_period[2];  // the measured speed in 1/x
+volatile unsigned int phase_period[2];  // the measured speed in 1/x
 volatile int blockcurlr[2];  // Current for sensorles bldc
 
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm

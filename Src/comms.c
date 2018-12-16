@@ -1,3 +1,5 @@
+#include <stdbool.h>
+#include <stdint.h>
 #include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"

@@ -1,11 +1,12 @@
 #pragma once
 #include <stdbool.h>
+#include <stdint.h>
 #include "weaking.h"
-extern volatile uint current_limit;
+extern volatile unsigned int current_limit;
 extern int currentlr[2];
-extern uint timer[2];
+extern unsigned int timer[2];
 extern uint8_t last_pos[2];
-extern uint phase_period[2];
+extern unsigned int phase_period[2];
 extern int blockcurlr[2];
 
 extern float batteryVoltage;

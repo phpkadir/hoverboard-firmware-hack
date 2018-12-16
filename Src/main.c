@@ -20,6 +20,7 @@
 */
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "stm32f1xx_hal.h"  // main code for stm32 controller
 #include "defines.h"  // for the macros
 #include "setup.h"  // for access the functions form setup

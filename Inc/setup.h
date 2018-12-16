@@ -22,6 +22,7 @@
 #pragma once
 
 #include "stm32f1xx_hal.h"
+#include <stdint.h>
 
 extern TIM_HandleTypeDef htim_left;
 extern TIM_HandleTypeDef htim_right;
