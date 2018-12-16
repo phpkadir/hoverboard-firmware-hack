@@ -194,12 +194,35 @@ void oldBuzzer(){  // buzzer for creating sounds
       HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
   }
 }
+
+volatile unsigned int phase_period[2];  // the measured speed in 1/x
+
+typedef void (*SetPhaseType)(int phase);
+void set_phase_l(int phase){
+#if defined(INVERT_L_DIRECTION)  // for other hardware needs this function to be rewritten
+  phase_period[0] = -phase;
+#else
+  phase_period[0] = phase;
+#endif
+}
+void set_phase_r(int phase){
+#if defined(INVERT_R_DIRECTION)
+  phase_period[1] = -phase;
+#else
+  phase_period[1] = phase;
+#endif
+}
+
+const SetPhaseType set_phase_lr[2] = {  // disable/enable motors
+  set_phase_l,
+  set_phase_r
+};
+
 volatile unsigned int current_limit;  // dynamic Currentlimit
 volatile int currentlr[2];  // Current for cutoff
 volatile int throttlelr[2];  // throttle for calcing pwm and weakening
 volatile unsigned int timer[2];  // timer for speed measuring
 volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
-volatile unsigned int phase_period[2];  // the measured speed in 1/x
 volatile int blockcurlr[2];  // Current for sensorles bldc
 
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
@@ -251,12 +274,15 @@ void sensored_brushless_countrol(){
     set_motor[x](phase);
     //speed measurung
     timer[x]++;
-    if(last_pos[x]!=real_pos){
-      phase_period[x] = timer[x];
+    if(last_pos[x] != real_pos){
+      if(next_pos(last_pos[x],1) == real_pos)
+        set_phase_lr[x](timer[x]);
+      else
+        set_phase_lr[x](-timer[x]);
       timer[x] = 0;
       last_pos[x] = real_pos;
-    } else if(timer[x] > phase_period[x])
-      phase_period[x] = timer[x];
+    } else if(timer[x] > abs(phase_period[x]))
+      set_phase_lr[x](SIGN(phase_period[x])*timer[x]);
     blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
   }
 }
@@ -288,12 +314,15 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
     set_motor[x](phase);
     //speed measurung
     timer[x]++;
-    if(last_pos[x]!=pos){
-      phase_period[x] = timer[x];
+    if(last_pos[x] != pos){
+      if(next_pos(last_pos[x],1) == pos)
+        set_phase_lr[x](timer[x]);
+      else
+        set_phase_lr[x](-timer[x]);
       timer[x] = 0;
       last_pos[x] = pos;
-    } else if(timer[x] > phase_period[x])
-      phase_period[x] = timer[x];
+    } else if(timer[x] > abs(phase_period[x]))
+      set_phase_lr[x](SIGN(phase_period[x])*timer[x]);
   }
 }
 //end Sensorless Control

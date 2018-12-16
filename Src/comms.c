@@ -10,9 +10,9 @@
 #include "control.h"
 //UART_HandleTypeDef huart2;
 
-int _buff_curlr[2];
-int _buff_phase[2];
-int _buff_ival[2];
+volatile int _buff_curlr[2];
+volatile int _buff_phase[2];
+volatile int _buff_ival[2];
 const int *virtual_currentlr[] = {currentlr,_buff_curlr};
 const int *virutal_phase[] = {phase_period,_buff_phase};
 #ifdef I2C_MASTER
