@@ -252,7 +252,7 @@ void sensored_brushless_countrol(){
         timer[x],
         throttlelr[x]))
       timing_pos = next_pos(real_pos,
-        SIGN(throttlelr[x]));
+        SIGN(internal_phase_period[x]));
     else
       timing_pos = real_pos;  // ifdef true end else else its always calced
     RetValWeak tmp = currentWeaking(throttlelr[x],
