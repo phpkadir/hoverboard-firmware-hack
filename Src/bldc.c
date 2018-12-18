@@ -224,7 +224,7 @@ volatile int throttlelr[2];  // throttle for calcing pwm and weakening
 volatile unsigned int timer[2];  // timer for speed measuring
 volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
 volatile int blockcurlr[2];  // Current for sensorles bldc
-volatile int internal_phase_period[2];
+volatile int internal_phase_period[2];  // For internal calculations only  PRIVATE NOT IN C HEADER
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
 volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the timing of the motor (to prebuild the electric fields)
