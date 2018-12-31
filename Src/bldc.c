@@ -333,6 +333,13 @@ typedef void (*IsrPtr)();
 volatile IsrPtr timer_brushless = calibration_func;
 volatile IsrPtr buzzerFunc = nullFunc;
 
+void set_buzzer(bool enable){
+    if(enable)
+      buzzerFunc = oldBuzzer;
+    else
+      buzzerFunc = nullFunc;
+}
+
 void calibration_func(){
   if(mainCounter < 1024)  // calibrate ADC offsets
     for(int x = 0; x < 6; x++)
