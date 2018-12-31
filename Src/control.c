@@ -158,7 +158,7 @@ int calc_torque(int throttle,int breaks){
     return -throttle;
   }
   else{
-    return throttle;
+    return throttle-breaks;
   }
 }
 #define STEERING_EAGLE_FACTOR 0.01

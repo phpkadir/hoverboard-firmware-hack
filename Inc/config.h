@@ -11,7 +11,7 @@
 
 #define DC_CUR_LIMIT     25         // Motor DC current limit in amps. it does not disable motors, it is a soft current limit.
 
-#define BAT_CELL_CNT     12.0
+#define BAT_CELL_CNT     10.0
 #define BAT_FULL_CELL    4.2
 #define BAT_RATED_CELL   3.7
 #define BAT_LOW1_CELL    3.5
