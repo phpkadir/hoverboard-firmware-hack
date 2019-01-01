@@ -35,84 +35,85 @@ void SystemClock_Config(void);
 
 //LCD_PCF8574_HandleTypeDef lcd;
 
-float adc1_filtered = 0,adc2_filtered = 0;
-
-int steer; // global variable for steering. -1000 to 1000
-int speed; // global variable for speed. -1000 to 1000
-
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
 
 int main(void) {
-  HAL_Init();
-  __HAL_RCC_AFIO_CLK_ENABLE();
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-  /* System interrupt init*/
-  /* MemoryManagement_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
-  /* BusFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
-  /* UsageFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
-  /* SVCall_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
-  /* DebugMonitor_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
-  /* PendSV_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  {
+    HAL_Init();
+    __HAL_RCC_AFIO_CLK_ENABLE();
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+    /* System interrupt init*/
+    /* MemoryManagement_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
+    /* BusFault_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
+    /* UsageFault_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
+    /* SVCall_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
+    /* DebugMonitor_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
+    /* PendSV_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
+    /* SysTick_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 
-  SystemClock_Config();
+    SystemClock_Config();
 
-  __HAL_RCC_DMA1_CLK_DISABLE();
-  MX_GPIO_Init();
-  MX_TIM_Init();
-  MX_ADC1_Init();
-  MX_ADC2_Init();
+    __HAL_RCC_DMA1_CLK_DISABLE();
+    MX_GPIO_Init();
+    MX_TIM_Init();
+    MX_ADC1_Init();
+    MX_ADC2_Init();
 
-  #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
-    UART_Init();
-  #endif
+    #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
+      UART_Init();
+    #endif
 
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);  // set latch to on
+    HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);  // set latch to on
 
-  HAL_ADC_Start(&hadc1);
-  HAL_ADC_Start(&hadc2);
+    HAL_ADC_Start(&hadc1);
+    HAL_ADC_Start(&hadc2);
 
-  set_buzzer(startUpSound);
+    set_buzzer(startUpSound);
 
-  HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+    HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
 
-  #ifdef CONTROL_PPM
-    PPM_Init();
-  #endif
+    #ifdef CONTROL_PPM
+      PPM_Init();
+    #endif
 
-  #ifdef DEBUG_I2C_LCD
-    I2C_Init();
-    HAL_Delay(50);
-    lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
-      lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
-      lcd.pcf8574.i2c = hi2c2;
-      lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
-      lcd.type = TYPE0;
+    #ifdef DEBUG_I2C_LCD
+      I2C_Init();
+      HAL_Delay(50);
+      lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
+        lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
+        lcd.pcf8574.i2c = hi2c2;
+        lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
+        lcd.type = TYPE0;
 
-      if(LCD_Init(&lcd)!=LCD_OK){
-          // error occured
-          //TODO while(1);
-      }
+        if(LCD_Init(&lcd)!=LCD_OK){
+            // error occured
+            //TODO while(1);
+        }
 
-    LCD_ClearDisplay(&lcd);
-    HAL_Delay(5);
-    LCD_SetLocation(&lcd, 0, 0);
-    LCD_WriteString(&lcd, "Hover V2.0");
-    LCD_SetLocation(&lcd, 0, 1);
-    LCD_WriteString(&lcd, "Initializing...");
-  #endif
+      LCD_ClearDisplay(&lcd);
+      HAL_Delay(5);
+      LCD_SetLocation(&lcd, 0, 0);
+      LCD_WriteString(&lcd, "Hover V2.0");
+      LCD_SetLocation(&lcd, 0, 1);
+      LCD_WriteString(&lcd, "Initializing...");
+    #endif
 
-  set_bldc_motors(true);
-  set_weaking(2);
+    set_bldc_motors(true);
+    set_weaking(2);
+
+    if(!load_eeprom()){
+      start_calibration();
+    }
+  }
   int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(5);
@@ -131,7 +132,7 @@ int main(void) {
       bool btn_release = false;
       unsigned long startTime = get_mainCounter();
       set_bldc_motors(false);
-      while(get_mainCounter < startTime + 32000){  // check button for 2s for release to only turn off if its pressed for 2 secs
+      while(get_mainCounter() < startTime + PWM_FREQ * 2){  // check button for 2s for release to only turn off if its pressed for 2 secs
         if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
           btn_release = true;
           break;
@@ -144,8 +145,19 @@ int main(void) {
       }
       else{
         set_buzzer(shutDownSound);
-        while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}  // wait for button release to turn off
-        turnOff();
+        btn_release = false;
+        while (get_mainCounter() < startTime + PWM_FREQ * 10) {
+          if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
+            btn_release = true;
+            break;
+        }  // wait for button release to turn off
+        if(btn_release) {
+          turnOff();
+        } else {
+          set_buzzer(resetSound);
+          while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));
+          turnOffWithReset();
+        }
       }
     }
 
@@ -224,6 +236,12 @@ void SystemClock_Config(void) {
 
 void turnOff(){
   //save data
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+  while(1);
+}
+
+void turnOffWithReset(){
+  //reset data for new init
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   while(1);
 }

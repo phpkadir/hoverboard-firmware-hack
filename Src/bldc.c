@@ -135,8 +135,6 @@ unsigned long get_mainCounter(){
 
 volatile float batteryVoltage = 40.0;  // measured batvoltage as float TODO: use int
 
-const int max_time = PWM_FREQ / 10; // never used
-
 typedef void (*setMotorType)(int *hPhase);
 void set_motor_r(int *hPhase){
   RIGHT_TIM->RIGHT_TIM_U = CLAMP(hPhase[0] + pwm_res / 2, 10, pwm_res-10);
@@ -324,12 +322,20 @@ void sensorless_brushless_countrol(){  // TODO: Only currentdriven control becau
 void calibration_func();  // for correct var accessing and do not set to public
 
 typedef void (*IsrPtr)();
-volatile IsrPtr timer_brushless = calibration_func;
+volatile IsrPtr timer_brushless = nullFunc;
 volatile IsrPtr buzzerFunc = nullFunc;
 
 void stop_buzzer(){
   buzzerFunc = nullFunc;
   HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
+}
+
+void start_calibration(){
+  timer_brushless = calibration_func;
+}
+
+void load_calibration(void* buffer){
+
 }
 
 void set_buzzer(void* buzzerfunc){

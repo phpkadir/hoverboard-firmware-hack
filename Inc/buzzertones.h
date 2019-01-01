@@ -12,3 +12,5 @@ void startUpSound();
 void shutDownSound();
 
 void buttonRelease();
+
+void resetSound();

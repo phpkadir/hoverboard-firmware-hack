@@ -47,3 +47,5 @@ void shutDownSound(){
 }
 
 void buttonRelease(){}
+
+void resetSound(){}

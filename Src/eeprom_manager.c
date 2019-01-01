@@ -3,5 +3,48 @@
 #include "stm32f1xx_hal_flash.h"
 
 
+uint64_t get_eeprom_version(){
+    return 0;
+}
+bool check_crc_v1(){
+    return true;
+}
+bool check_crc_v0(){
+    //check if its resetted
+    return true;
+}
+void reset_eeprom(){
+    // clean eeprom set version 0
+    set_eeprom_version(0);
+}
+void set_eeprom_version(uint64_t version){
+
+}
+void load_eeprom_v1(){
+
+}
+bool load_eeprom(){
+    switch(get_eeprom_version()){
+        case 1:
+            if(check_crc_v1()){
+                load_eeprom_v1();
+                return true;
+            } else {
+                break;
+            }
+        case 0:
+            if(check_crc_v0())
+                return false;
+            else
+                break;
+        default:  // unknown version -> reset
+            break;
+    }
+    reset_eeprom();
+    return false;
+}
+
+
+
 __attribute__ ((section(".persistent_variables")))
 volatile uint8_t persisten_mem[32*1024];
