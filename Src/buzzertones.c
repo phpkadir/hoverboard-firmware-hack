@@ -22,19 +22,19 @@ void oldBuzzer(){  // buzzer for creating sounds
 */
 
 void lowBattery1(){
-    int buzzerFreq = 5;
-    int buzzerPattern = 8;
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(!((curBuzzTime / (PWM_FREQ / 3)) % 2))
+        create_buzzer_wave(curBuzzTime, 4);
 }
 void lowBattery2(){
-    int buzzerFreq = 5;
-    int buzzerPattern = 1;
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(!((curBuzzTime / (PWM_FREQ / 4)) % 2))
+        create_buzzer_wave(curBuzzTime, 3);
 }
 void lowBattery3(){
-    int buzzerPattern = 0;
-      for (int i = 0; i < 8; i++) {
-        int buzzerFreq = i;
-        HAL_Delay(100);
-      }
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(!((curBuzzTime / (PWM_FREQ / 6)) % 2))
+        create_buzzer_wave(curBuzzTime, 2);
 }
 
 void startUpSound(){
