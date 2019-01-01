@@ -339,6 +339,8 @@ void load_calibration(void* buffer){
 }
 
 void set_buzzer(void* buzzerfunc){
+  if(buzzerFunc == buzzerfunc)
+    return;
   set_buzzerStart(mainCounter);
   buzzerFunc = buzzerfunc;
 }

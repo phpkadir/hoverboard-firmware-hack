@@ -4,6 +4,7 @@
 #include "defines.h"  // for the macros
 #include "bldc.h"
 #include "config.h"  // the config
+
 volatile unsigned long buzzerStart;
 
 void set_buzzerStart(unsigned long mainCnt){
@@ -36,16 +37,47 @@ void lowBattery3(){
       }
 }
 
-void startUpSound(){}
-void shutDownSound(){
-     int buzzerFreq = 0;
-      int buzzerPattern = 0;
-      for (int i = 0; i < 8; i++) {
-        buzzerFreq = i;
-        HAL_Delay(100);
-      }
+void startUpSound(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(curBuzzTime < PWM_FREQ * 8 / 10)
+        create_buzzer_wave(curBuzzTime, 8 - (curBuzzTime / (PWM_FREQ / 10))); // 1-8khz 1khz step
+    else
+        stop_buzzer();
 }
 
-void buttonRelease(){}
+void shutDownSound(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(curBuzzTime < PWM_FREQ * 8 / 10)
+        create_buzzer_wave(curBuzzTime, curBuzzTime / (PWM_FREQ / 10));  // 8-1khz 1khz step
+    else
+        stop_buzzer();
+}
 
-void resetSound(){}
+void create_buzzer_wave(unsigned long hTime, int freq){
+    if(hTime % freq)
+        HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+}
+
+void buttonRelease(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(curBuzzTime < PWM_FREQ / 4)  // 1/4s peep
+        create_buzzer_wave(curBuzzTime, 4); // 2 khz
+    else
+        stop_buzzer();
+}
+
+void resetSound(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    switch(curBuzzTime / (PWM_FREQ / 8)){
+        case 0:
+            create_buzzer_wave(curBuzzTime, 8);
+        case 1:
+            break;
+        case 2:
+            create_buzzer_wave(curBuzzTime, 4);
+        case 3:
+            break;
+        default:
+            create_buzzer_wave(curBuzzTime, 8);
+    }
+}
