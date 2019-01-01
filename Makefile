@@ -45,6 +45,8 @@ Src/stm32f1xx_it.c \
 Src/weaking.c\
 Src/buzzertones.c\
 Src/timing.c\
+Src/eeprom_manager.c\
+
 
 # ASM sources
 ASM_SOURCES =  \
