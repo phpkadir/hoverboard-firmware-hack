@@ -63,6 +63,7 @@ void reverseSound(){
     if(!((curBuzzTime / (PWM_FREQ) % 2))
         create_buzzer_wave(curBuzzTime, 5);
 }
+
 }
 
 void buttonRelease(){
