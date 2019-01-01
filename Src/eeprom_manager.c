@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
-#include "stm32f1xx_hal_flash.h"
+//#include "stm32f1xx_hal_flash.h"
 #include "bldc.h"
 
 uint64_t get_eeprom_version(){
