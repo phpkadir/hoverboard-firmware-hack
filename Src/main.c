@@ -111,27 +111,26 @@ int main(void) {
     set_weaking(2);
 
     load_eeprom();  // initialize variables from eeprom or initialize them
+    while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
   }
   int tmp_trottle[2] = {0,0};
   while(1) {
-    HAL_Delay(5);
+    HAL_Delay(3);
     // ####### larsm's bobby car code #######
     calc_torque_per_wheel(
       calc_torque(
-        clean_adc(virtual_ival[1][0]),
-        clean_adc(virtual_ival[1][1])),
-      clean_adc(virtual_ival[0][0]),
+        clean_adc(virtual_ival[0][0]),
+        clean_adc(virtual_ival[0][1])),
+      clean_adc(virtual_ival[1][0]),
       tmp_trottle);
-    tmp_trottle[0] = CLAMP(((virtual_ival[1][0] & 0xFFFF) - ADC_MID)/2,-1000,1000);
-    tmp_trottle[1] = CLAMP(((virtual_ival[1][1] & 0xFFFF) - ADC_MID)/2,-1000,1000);
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
 
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
       bool btn_release = false;
       unsigned long startTime = get_mainCounter();
       set_bldc_motors(false);
-      while(get_mainCounter() < startTime + PWM_FREQ * 2){  // check button for 2s for release to only turn off if its pressed for 2 secs
-        if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
+      while(get_mainCounter() < (startTime + (PWM_FREQ * 2))){  // check button for 2s for release to only turn off if its pressed for 2 secs
+        if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){  // if button released
           btn_release = true;
           break;
         }
@@ -143,8 +142,7 @@ int main(void) {
       }
       else{
         set_buzzer(shutDownSound);
-        btn_release = false;
-        while (get_mainCounter() < startTime + PWM_FREQ * 10) {
+        while (get_mainCounter() < (startTime + (PWM_FREQ * 10))) {
           if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
             btn_release = true;
             break;

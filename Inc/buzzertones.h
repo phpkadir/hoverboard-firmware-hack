@@ -11,6 +11,8 @@ void lowBattery3();
 void startUpSound();
 void shutDownSound();
 
+void reverseSound();
+
 void buttonRelease();
 
 void resetSound();

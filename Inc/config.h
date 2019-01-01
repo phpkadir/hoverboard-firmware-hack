@@ -73,6 +73,7 @@
 #define INVERT_R_DIRECTION
 #endif // INVERT_R_DIRECTION
 
+#define I2C_MASTER
 
 //Turbo boost at high speeds while button1 is pressed:
 // ###### BOBBYCAR ######

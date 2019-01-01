@@ -48,7 +48,7 @@ void startUpSound(){
 void shutDownSound(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
     if(curBuzzTime < PWM_FREQ * 8 / 10)
-        create_buzzer_wave(curBuzzTime, curBuzzTime / (PWM_FREQ / 10));  // 8-1khz 1khz step
+        create_buzzer_wave(curBuzzTime, (curBuzzTime / (PWM_FREQ / 10)) + 1);  // 8-1khz 1khz step
     else
         stop_buzzer();
 }
@@ -56,6 +56,13 @@ void shutDownSound(){
 void create_buzzer_wave(unsigned long hTime, int freq){
     if(hTime % freq)
         HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+}
+
+void reverseSound(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(!((curBuzzTime / (PWM_FREQ) % 2))
+        create_buzzer_wave(curBuzzTime, 5);
+}
 }
 
 void buttonRelease(){
