@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "stm32f1xx_hal_flash.h"
-
+#include "bldc.h"
 
 uint64_t get_eeprom_version(){
     return 0;
@@ -23,25 +23,26 @@ void set_eeprom_version(uint64_t version){
 void load_eeprom_v1(){
 
 }
-bool load_eeprom(){
+void load_eeprom(){
     switch(get_eeprom_version()){
         case 1:
             if(check_crc_v1()){
                 load_eeprom_v1();
-                return true;
+                return;
             } else {
                 break;
             }
         case 0:
-            if(check_crc_v0())
-                return false;
-            else
+            if(check_crc_v0()){
+                bldc_start_calibration();
+                return;
+            } else {
                 break;
+            }
         default:  // unknown version -> reset
             break;
     }
     reset_eeprom();
-    return false;
 }
 
 

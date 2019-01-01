@@ -110,9 +110,7 @@ int main(void) {
     set_bldc_motors(true);
     set_weaking(2);
 
-    if(!load_eeprom()){
-      start_calibration();
-    }
+    load_eeprom();  // initialize variables from eeprom or initialize them
   }
   int tmp_trottle[2] = {0,0};
   while(1) {

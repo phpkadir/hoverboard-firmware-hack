@@ -21,3 +21,6 @@ void set_bldc_motors(bool enable);
 void set_throttle(int left,int right);
 
 void set_buzzer(void* buzzerfunc);
+
+void bldc_start_calibration();
+void bldc_load_calibration(void* buffer);

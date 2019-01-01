@@ -330,11 +330,11 @@ void stop_buzzer(){
   HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
 }
 
-void start_calibration(){
+void bldc_start_calibration(){
   timer_brushless = calibration_func;
 }
 
-void load_calibration(void* buffer){
+void bldc_load_calibration(void* buffer){
 
 }
 
