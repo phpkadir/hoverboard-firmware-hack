@@ -7,9 +7,7 @@
 #include "config.h"
 #include "weaking.h"
 #include "buzzertones.h"
-
-uint8_t buzzerFreq = 0;
-uint8_t buzzerPattern = 0;
+#include "timing.h"
 
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 

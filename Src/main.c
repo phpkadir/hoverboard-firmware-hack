@@ -76,7 +76,7 @@ int main(void) {
     UART_Init();
   #endif
 
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);  // set latch to on
 
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc2);
@@ -112,7 +112,7 @@ int main(void) {
   #endif
 
   set_bldc_motors(true);
-  set_weaking(1);
+  set_weaking(2);
   int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(5);

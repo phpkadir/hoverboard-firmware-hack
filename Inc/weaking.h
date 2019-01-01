@@ -9,6 +9,5 @@ RetValWeak nullFuncWeak(int pwm, unsigned int period, unsigned int cur_phase, in
 extern const WeakStruct weakfunctions[];
 void set_weaking(int x);
 const char* get_weaking_name(int x);
+int get_currentWeaking();
 
-typedef bool (*TimingPtr)(int lst_phase, int cur_phase, int throttle);
-bool no_timing(int lst_phase, int cur_phase, int throttle);

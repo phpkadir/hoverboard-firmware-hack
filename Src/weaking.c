@@ -5,7 +5,7 @@
 #include "bldc.h"
 #include "config.h"
 
-RetValWeak  (int torque, unsigned int period, unsigned int cur_phase, int current){
+RetValWeak longRange (int torque, unsigned int period, unsigned int cur_phase, int current){
   return (RetValWeak){ .pwm  = torque, .weak = 0};
 }
 RetValWeak STVO6kmh(int torque, unsigned int period, unsigned int cur_phase, int current){
@@ -36,13 +36,13 @@ void set_weaking(int x){
   currentWeaking = weakfunctions[x].func;
   current_limit = weakfunctions[x].cur_limit;
 }
-bool calc_timing(int lst_phase, int cur_phase, int throttle){ // todo timing algorythms
-  return false;
-}
-bool no_timing(int lst_phase, int cur_phase, int throttle){
-  return false;
-}
 
 const char* get_weaking_name(int x){
   return weakfunctions[x].name;
+}
+
+int get_currentWeaking(){
+  int x = 0;
+  while(weakfunctions[x].func != currentWeaking) x++;
+  return x;
 }
