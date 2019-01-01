@@ -6,23 +6,29 @@
 uint64_t get_eeprom_version(){
     return 0;
 }
+
 bool check_crc_v1(){
     return true;
 }
+
 bool check_crc_v0(){
     //check if its resetted
     return true;
 }
+
+void set_eeprom_version(uint64_t version){
+
+}
+
 void reset_eeprom(){
     // clean eeprom set version 0
     set_eeprom_version(0);
 }
-void set_eeprom_version(uint64_t version){
 
-}
 void load_eeprom_v1(){
 
 }
+
 void load_eeprom(){
     switch(get_eeprom_version()){
         case 1:
