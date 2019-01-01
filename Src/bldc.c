@@ -329,6 +329,7 @@ volatile IsrPtr buzzerFunc = nullFunc;
 
 void stop_buzzer(){
   buzzerFunc = nullFunc;
+  HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
 }
 
 void set_buzzer(void* buzzerfunc){
@@ -346,10 +347,17 @@ void calibration_func(){
 
 void set_bldc_motors(bool enable){
   if(timer_brushless != calibration_func){  // if calibration is running do NOT enable Brushless motors
-    if(enable)
+    if(enable) {
       timer_brushless = sensored_brushless_countrol;
-    else
+    }
+    else {
       timer_brushless = nullFunc;
+      int phase[3];  // disable output
+      for(int x = 0; x < 2; x++){
+        blockPWM(0, last_pos[x], &phase[0], &phase[1], &phase[2]);
+        set_motor[x](phase);
+      }
+    }
   }
 }
 
