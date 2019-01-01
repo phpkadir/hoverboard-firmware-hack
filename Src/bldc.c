@@ -6,6 +6,7 @@
 #include "control.h"
 #include "config.h"
 #include "weaking.h"
+#include "buzzertones.h"
 
 uint8_t buzzerFreq = 0;
 uint8_t buzzerPattern = 0;
@@ -130,6 +131,10 @@ uint16_t adc_offset[6] = {  // offests as array for looping adc
 };
 volatile unsigned long mainCounter = 0;  // global time incremented by interrupt
 
+unsigned long get_mainCounter(){
+  return mainCounter;
+}
+
 volatile float batteryVoltage = 40.0;  // measured batvoltage as float TODO: use int
 
 const int max_time = PWM_FREQ / 10; // never used
@@ -185,15 +190,6 @@ const SetBoolFunc set_tim_lr[2] = {  // disable/enable motors
 };
 
 void nullFunc(){}  // Function for empty funktionpointer becasue Jump NULL != ret
-
-void oldBuzzer(){  // buzzer for creating sounds
-  if (buzzerFreq != 0 && (mainCounter / 5000) % (buzzerPattern + 1) == 0) {
-    if (mainCounter % buzzerFreq == 0)
-      HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
-  } else {
-      HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
-  }
-}
 
 volatile int phase_period[2];  // the measured speed in 1/x
 
@@ -333,11 +329,13 @@ typedef void (*IsrPtr)();
 volatile IsrPtr timer_brushless = calibration_func;
 volatile IsrPtr buzzerFunc = nullFunc;
 
-void set_buzzer(bool enable){
-    if(enable)
-      buzzerFunc = oldBuzzer;
-    else
-      buzzerFunc = nullFunc;
+void stop_buzzer(){
+  buzzerFunc = nullFunc;
+}
+
+void set_buzzer(void* buzzerfunc){
+  set_buzzerStart(mainCounter);
+  buzzerFunc = buzzerfunc;
 }
 
 void calibration_func(){
@@ -355,7 +353,6 @@ void set_bldc_motors(bool enable){
     else
       timer_brushless = nullFunc;
   }
-
 }
 
 void set_throttle(int left,int right){  // get set access for the throttle and switchin the direction of one motor

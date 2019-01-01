@@ -25,6 +25,7 @@
 #include "defines.h"  // for the macros
 #include "setup.h"  // for access the functions form setup
 #include "bldc.h"  // for the main control variables
+#include "buzzertones.h"
 //#include "hd44780.h"  // for the display
 #include "config.h"  // the config
 #include "comms.h"
@@ -80,12 +81,7 @@ int main(void) {
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc2);
 
-  set_buzzer(true);
-  for (int i = 8; i >= 0; i--) {
-    buzzerFreq = i;
-    HAL_Delay(100);
-  }
-  buzzerFreq = 0;
+  set_buzzer(startUpSound);
 
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
 
@@ -116,6 +112,7 @@ int main(void) {
   #endif
 
   set_bldc_motors(true);
+  set_weaking(1);
   int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(5);
@@ -130,37 +127,39 @@ int main(void) {
     tmp_trottle[1] = CLAMP(((virtual_ival[1][1] & 0xFFFF) - ADC_MID)/2,-1000,1000);
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
 
-    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
+    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
+      bool btn_release = false;
+      unsigned long startTime = get_mainCounter();
       set_bldc_motors(false);
-      while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
-      buzzerFreq = 0;
-      buzzerPattern = 0;
-      for (int i = 0; i < 8; i++) {
-        buzzerFreq = i;
-        HAL_Delay(100);
+      while(get_mainCounter < startTime + 32000){  // check button for 2s for release to only turn off if its pressed for 2 secs
+        if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
+          btn_release = true;
+          break;
+        }
       }
-      HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-      while(1) {}
+      if(btn_release){
+        set_buzzer(buttonRelease);
+        set_bldc_motors(true);
+        // do something
+      }
+      else{
+        set_buzzer(shutDownSound);
+        while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}  // wait for button release to turn off
+        turnOff();
+      }
     }
 
     if (batteryVoltage < BAT_LOW_LVL1 && batteryVoltage > BAT_LOW_LVL2) {
-      buzzerFreq = 5;
-      buzzerPattern = 8;
+      set_buzzer(lowBattery1);
+      current_limit = 15;  // limiting the motorcurrent
     } else if  (batteryVoltage < BAT_LOW_LVL2 && batteryVoltage > BAT_LOW_DEAD) {
-      buzzerFreq = 5;
-      buzzerPattern = 1;
+      set_buzzer(lowBattery2);
+      current_limit = 10;  // limiting the motorcurrent to a lower value
     } else if  (batteryVoltage < BAT_LOW_DEAD) {
-      buzzerPattern = 0;
+      set_buzzer(lowBattery3);
       set_bldc_motors(false);
-      for (int i = 0; i < 8; i++) {
-        buzzerFreq = i;
-        HAL_Delay(100);
-      }
-      HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-      while(1) {}
-    } else {
-      buzzerFreq = 0;
-      buzzerPattern = 0;
+      HAL_Delay(200);
+      turnOff();
     }
   }
 }
@@ -221,4 +220,10 @@ void SystemClock_Config(void) {
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+}
+
+void turnOff(){
+  //save data
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+  while(1);
 }

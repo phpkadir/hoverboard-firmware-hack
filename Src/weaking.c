@@ -5,7 +5,7 @@
 #include "bldc.h"
 #include "config.h"
 
-RetValWeak longRange(int torque, unsigned int period, unsigned int cur_phase, int current){
+RetValWeak  (int torque, unsigned int period, unsigned int cur_phase, int current){
   return (RetValWeak){ .pwm  = torque, .weak = 0};
 }
 RetValWeak STVO6kmh(int torque, unsigned int period, unsigned int cur_phase, int current){
