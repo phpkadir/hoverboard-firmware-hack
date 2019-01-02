@@ -1,3 +1,4 @@
+//FINAL V1.0
 #include <stdbool.h>
 #include <stdint.h>
 #include "stm32f1xx_hal.h"  // main code for stm32 controller
@@ -10,27 +11,19 @@ volatile unsigned long buzzerStart;
 void set_buzzerStart(unsigned long mainCnt){
     buzzerStart = mainCnt;
 }
-/*
-void oldBuzzer(){  // buzzer for creating sounds
-  if (int buzzerFreq != 0 && (get_mainCounter() / 5000) % (buzzerPattern + 1) == 0) {
-    if (get_mainCounter() %int buzzerFreq == 0)
-      HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
-  } else {
-      HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
-  }
-}
-*/
 
 void lowBattery1(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
     if(!((curBuzzTime / (PWM_FREQ / 3)) % 2))
         create_buzzer_wave(curBuzzTime, 4);
 }
+
 void lowBattery2(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
     if(!((curBuzzTime / (PWM_FREQ / 4)) % 2))
         create_buzzer_wave(curBuzzTime, 3);
 }
+
 void lowBattery3(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
     if(!((curBuzzTime / (PWM_FREQ / 6)) % 2))

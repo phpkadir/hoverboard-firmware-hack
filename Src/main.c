@@ -38,13 +38,15 @@ void SystemClock_Config(void);
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
-
+ 
+ //BETA V0.1 WORKING
 void turnOff(){
   //save data
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   while(1);
 }
 
+ //BETA V0.1 WORKING
 void turnOffWithReset(){
   //reset data for new init
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
@@ -142,7 +144,7 @@ int main(void) {
     #endif
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
     
-
+    //START FINAL CODE
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
       bool btn_release = false;
       unsigned long startTime = get_mainCounter();
@@ -175,6 +177,7 @@ int main(void) {
         }
       }
     }
+    //END FINAL CODE
 
     if (batteryVoltage < BAT_LOW_LVL1 && batteryVoltage > BAT_LOW_LVL2) {
       set_buzzer(lowBattery1);
