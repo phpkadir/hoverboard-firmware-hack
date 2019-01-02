@@ -120,12 +120,11 @@ int main(void) {
       LCD_SetLocation(&lcd, 0, 1);
       LCD_WriteString(&lcd, "Initializing...");
     #endif
-
-    set_bldc_motors(true);
     set_weaking(2);
 
     load_eeprom();  // initialize variables from eeprom or initialize them
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
+    set_bldc_motors(true);
   }
   int tmp_trottle[2] = {0,0};
   while(1) {
@@ -142,7 +141,7 @@ int main(void) {
       set_buzzer(reverseSound);
     }
     #endif
-    tmp_trottle[0] = tmp_trottle[1] = CLAMP(((virtual_ival[0][0])-ADC_MID)/2 >> 16,-1000,1000);
+    tmp_trottle[0] = tmp_trottle[1] = 50;
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
     
     //START FINAL CODE
