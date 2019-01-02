@@ -60,10 +60,8 @@ void create_buzzer_wave(unsigned long hTime, int freq){
 
 void reverseSound(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
-    if(!((curBuzzTime / (PWM_FREQ) % 2))
+    if(!((curBuzzTime / (PWM_FREQ) % 2)))
         create_buzzer_wave(curBuzzTime, 5);
-}
-
 }
 
 void buttonRelease(){

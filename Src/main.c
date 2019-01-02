@@ -39,6 +39,18 @@ void SystemClock_Config(void);
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
 
+void turnOff(){
+  //save data
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+  while(1);
+}
+
+void turnOffWithReset(){
+  //reset data for new init
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+  while(1);
+}
+
 int main(void) {
   {
     HAL_Init();
@@ -143,9 +155,10 @@ int main(void) {
       else{
         set_buzzer(shutDownSound);
         while (get_mainCounter() < (startTime + (PWM_FREQ * 10))) {
-          if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
+          if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
             btn_release = true;
             break;
+          }
         }  // wait for button release to turn off
         if(btn_release) {
           turnOff();
@@ -228,16 +241,4 @@ void SystemClock_Config(void) {
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-}
-
-void turnOff(){
-  //save data
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  while(1);
-}
-
-void turnOffWithReset(){
-  //reset data for new init
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  while(1);
 }
