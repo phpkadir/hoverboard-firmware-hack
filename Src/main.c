@@ -142,6 +142,7 @@ int main(void) {
       set_buzzer(reverseSound);
     }
     #endif
+    tmp_trottle[0] = tmp_trottle[1] = CLAMP(((virtual_ival[0][0])-ADC_MID)/2 >> 16,-1000,1000);
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
     
     //START FINAL CODE

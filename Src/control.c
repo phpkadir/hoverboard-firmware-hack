@@ -121,13 +121,13 @@ void Nunchuck_Read() {
   //setScopeChannel(3, ((int)nunchuck_data[5] >> 1) & 1);
 }
 
-int clean_adc(int inval){
-	if((inval & 0x3FF)-DEAD_ZONE-ADC_MIN<0)
+int clean_adc(uint32_t inval){
+  if((inval << 16)-DEAD_ZONE-ADC_MIN<0)
     return PWM_MIN;  // if ival in under deadzone
-	else if((inval & 0x3FF)>ADC_MAX-2*DEAD_ZONE)
+	else if((inval << 16)>ADC_MAX-2*DEAD_ZONE)
     return PWM_MAX;  // if ival in upper deadzone
   else
-	  return (((inval & 0x3FF) - DEAD_ZONE - ADC_MIN) * (PWM_MAX - PWM_MIN)) / (ADC_MAX - ADC_MIN) + PWM_MIN;  // Map value linear to area in PWM area
+	  return (((inval << 16) - DEAD_ZONE - ADC_MIN) * (PWM_MAX - PWM_MIN)) / (ADC_MAX - ADC_MIN) + PWM_MIN;  // Map value linear to area in PWM area
 }
 
 #define WHEELBASE 2
