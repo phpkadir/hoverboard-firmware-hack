@@ -239,7 +239,8 @@ void sensored_brushless_countrol(){
   int wphase[3];
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
-    set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
+    //set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
+    set_tim_lr[x](x);  // a bit dirty but for a test ok :)
     uint8_t timing_pos, real_pos = get_pos[x];
     if(currentTiming(internal_phase_period[x],
         timer[x],
