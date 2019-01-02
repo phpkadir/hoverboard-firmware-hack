@@ -135,7 +135,13 @@ int main(void) {
         clean_adc(virtual_ival[0][1])),
       clean_adc(virtual_ival[1][0]),
       tmp_trottle);
+    #ifdef BEEPS_BACKWARD
+    if(tmp_trottle[0] + tmp_trottle[1] < 0){
+      set_buzzer(reverseSound);
+    }
+    #endif
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
+    
 
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
       bool btn_release = false;
