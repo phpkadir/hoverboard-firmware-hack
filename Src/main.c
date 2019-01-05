@@ -38,7 +38,7 @@ void SystemClock_Config(void);
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
- 
+
  //BETA V0.1 WORKING
 void turnOff(){
   //save data
@@ -142,9 +142,9 @@ int main(void) {
       set_buzzer(reverseSound);
     }
     #endif
-    
+
     set_throttle((adc_buffer.l_tx2-ADC_MID)/2,(adc_buffer.l_rx2-ADC_MID)/2);
-    
+
     //START FINAL CODE
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
       bool btn_release = false;
