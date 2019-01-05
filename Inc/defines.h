@@ -152,6 +152,7 @@
 #define BAT_LOW_DEAD     (BAT_CELL_CNT*BAT_LOW_DEAD_CELL)       // undervoltage lockout. ~3.1V/cell
 #define BAT_FULL         (BAT_CELL_CNT*BAT_FULL_CELL)
 #define BAT_RATED        (BAT_CELL_CNT*BAT_RATED_CELL)
+#define BATTERY_VOLTAGE2ADC12(x) (uint32_t)((float)((float)x / ((float)BAT_CALIB_REAL_VOLTAGE / (float)BAT_CALIB_ADC))*1024.0f)
 
 typedef struct {
   uint16_t rr1;

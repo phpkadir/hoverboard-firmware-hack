@@ -178,19 +178,22 @@ int main(void) {
         }
       }
     }
-    //END FINAL CODE
 
-    if (batteryVoltage < BAT_LOW_LVL1 && batteryVoltage > BAT_LOW_LVL2) {
-      set_buzzer(lowBattery1);
-      current_limit = 15;  // limiting the motorcurrent
-    } else if  (batteryVoltage < BAT_LOW_LVL2 && batteryVoltage > BAT_LOW_DEAD) {
-      set_buzzer(lowBattery2);
-      current_limit = 10;  // limiting the motorcurrent to a lower value
-    } else if  (batteryVoltage < BAT_LOW_DEAD) {
+    //END FINAL CODE
+    if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_DEAD)) {
       set_buzzer(lowBattery3);
       set_bldc_motors(false);
       HAL_Delay(200);
       turnOff();
+    }
+    else if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2)) {
+      set_buzzer(lowBattery2);
+      current_limit = 10;  // limiting the motorcurrent to a lower value
+    }
+
+    else if (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL1)) {
+      set_buzzer(lowBattery1);
+      current_limit = 15;  // limiting the motorcurrent
     }
   }
   goto main_loop;

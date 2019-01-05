@@ -145,7 +145,7 @@ unsigned long get_mainCounter(){
   return mainCounter;
 }
 
-volatile float batteryVoltage = 40.0;  // measured batvoltage as float TODO: use int
+volatile uint32_t battery_voltage = 1704<<10;// done use int
 
 typedef void (*setMotorType)(int *hPhase);
 void set_motor_r(int *hPhase){
@@ -394,7 +394,7 @@ void DMA1_Channel1_IRQHandler() {
   buzzerFunc();
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
   //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
-  if (!(mainCounter & 0x3FF))  // because you get float rounding errors if it would run every time every 1024th time
-    batteryVoltage = batteryVoltage * 0.99 + ((float)adc_buffer.batt1 * ((float)BAT_CALIB_REAL_VOLTAGE / (float)BAT_CALIB_ADC)) * 0.01;
+  if (!(mainCounter & 0x3F))  // because you get float rounding errors if it would run every time every 1024th time
+    battery_voltage = battery_voltage * ((1<<10)-1) / (1<<10) + adc_buffer.batt1;
   // murks
 }
