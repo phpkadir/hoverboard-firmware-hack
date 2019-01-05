@@ -99,6 +99,7 @@ else {\
 #define PWM_MAX 1000
 #define PWM_REVERSE_MAX -300
 #define WEAKING_PWM_MAX 450
+#define THROTTLE_MAX 1000
 // ################################################################################
 
 // validate settings (do not touch this):
