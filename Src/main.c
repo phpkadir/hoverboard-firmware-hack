@@ -143,7 +143,19 @@ int main(void) {
     }
     #endif
 
-    set_throttle((adc_buffer.l_tx2-ADC_MID)/2+(adc_buffer.l_rx2-ADC_MID)/2,(adc_buffer.l_tx2-ADC_MID)/2-(adc_buffer.l_rx2-ADC_MID)/2);
+    int speed = adc_buffer.l_rx2-ADC_MID / 4;
+    int turn = adc_buffer.l_tx2-ADC_MID / 12;
+
+    if (ABS(turn) < 2) {
+      turn = 0;
+    }
+    if (ABS(speed) < 5) {
+      speed = 0;
+    }
+
+    set_throttle(speed + turn, speed - turn);
+      // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
+      // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 
     //START FINAL CODE
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
