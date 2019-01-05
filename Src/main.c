@@ -144,11 +144,14 @@ int main(void) {
     #endif
 
     int speed = adc_buffer.l_rx2-ADC_MID / 4;
-    int turn = adc_buffer.l_tx2-ADC_MID / 12;
+    int turn = adc_buffer.l_tx2-ADC_MID / 8;
 
-    if (ABS(turn) < 2) {
+    if (ABS(turn) < 4) {
       turn = 0;
+    } else {
+      turn -= 4 * SIGN(turn);
     }
+
     if (ABS(speed) < 5) {
       speed = 0;
     }
