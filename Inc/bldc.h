@@ -25,5 +25,3 @@ void set_buzzer(void* buzzerfunc);
 
 void bldc_start_calibration();
 void bldc_load_calibration(void* buffer);
-
-void enable_fauth();

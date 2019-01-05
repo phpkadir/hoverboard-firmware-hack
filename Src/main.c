@@ -125,7 +125,6 @@ int main(void) {
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
     set_weaking(2);
     set_bldc_motors(true);
-    enable_fauth();
   }
   int tmp_trottle[2] = {0,0};
   main_loop: // a bit dirty :)
