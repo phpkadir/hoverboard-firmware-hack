@@ -235,14 +235,18 @@ uint8_t next_pos(uint8_t oldpos, int8_t direction){
   }
 }
 
+typedef void (*IsrPtr)();
+volatile IsrPtr timer_brushless = nullFunc;
+volatile IsrPtr buzzerFunc = nullFunc;
+
 void sensored_brushless_countrol(){
   //PWM part
   int phase[3];
   int wphase[3];
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
-    //set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
-    set_tim_lr[x](true); // ok for testing
+    set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
+    //set_tim_lr[x](true); // ok for testing
     uint8_t real_pos = get_pos[x];
     #ifdef TIMING_ENABLE
     uint8_t timing_pos;
@@ -288,11 +292,149 @@ void sensored_brushless_countrol(){
   }
 }
 
-void calibration_func();  // for correct var accessing and do not set to public
 
-typedef void (*IsrPtr)();
-volatile IsrPtr timer_brushless = nullFunc;
-volatile IsrPtr buzzerFunc = nullFunc;
+// fauth
+int offsetcount = 0;
+int offsetrl1   = 2000;
+int offsetrl2   = 2000;
+int offsetrr1   = 2000;
+int offsetrr2   = 2000;
+int offsetdcl   = 2000;
+int offsetdcr   = 2000;
+
+const uint8_t hall_to_pos[8] = {
+    0,
+    0,
+    2,
+    1,
+    4,
+    5,
+    3,
+    0,
+};
+
+void fauth_brushless_control(){
+  if(offsetcount < 1000) {  // calibrate ADC offsets
+    offsetrl1 = (adc_buffer.rl1 + offsetrl1) / 2;
+    offsetrl2 = (adc_buffer.rl2 + offsetrl2) / 2;
+    offsetrr1 = (adc_buffer.rr1 + offsetrr1) / 2;
+    offsetrr2 = (adc_buffer.rr2 + offsetrr2) / 2;
+    offsetdcl = (adc_buffer.dcl + offsetdcl) / 2;
+    offsetdcr = (adc_buffer.dcr + offsetdcr) / 2;
+    return;
+  }
+
+  //disable PWM when current limit is reached (current chopping)
+  if(ABS((adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT) {
+    LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
+    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+  } else {
+    LEFT_TIM->BDTR |= TIM_BDTR_MOE;
+    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
+  }
+
+  if(ABS((adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP)  > DC_CUR_LIMIT) {
+    RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
+  } else {
+    RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
+  }
+
+  int ul, vl, wl;
+  int ur, vr, wr;
+
+  //determine next position based on hall sensors
+  uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
+  uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
+  uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
+
+  uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
+  uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
+  uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
+
+  uint8_t halll = hall_ul * 1 + hall_vl * 2 + hall_wl * 4;
+  uint8_t posl          = hall_to_pos[halll];
+  posl += 2;
+  posl %= 6;
+
+  uint8_t hallr = hall_ur * 1 + hall_vr * 2 + hall_wr * 4;
+  uint8_t posr          = hall_to_pos[hallr];
+  posr += 2;
+  posr %= 6;
+
+  blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &currentlr[0]);
+
+  //setScopeChannel(2, (adc_buffer.rl1 - offsetrl1) / 8);
+  //setScopeChannel(3, (adc_buffer.rl2 - offsetrl2) / 8);
+
+
+  // uint8_t buzz(uint16_t *notes, uint32_t len){
+    // static uint32_t counter = 0;
+    // static uint32_t timer = 0;
+    // if(len == 0){
+        // return(0);
+    // }
+    
+    // struct {
+        // uint16_t freq : 4;
+        // uint16_t volume : 4;
+        // uint16_t time : 8;
+    // } note = notes[counter];
+    
+    // if(timer / 500 == note.time){
+        // timer = 0;
+        // counter++;
+    // }
+    
+    // if(counter == len){
+        // counter = 0;
+    // }
+
+    // timer++;
+    // return(note.freq);
+  // }
+
+
+  //update PWM channels based on position
+  blockPWM(throttlelr[0], posl, &ul, &vl, &wl);
+  blockPWM(throttlelr[1], posr, &ur, &vr, &wr);
+
+  int weakul, weakvl, weakwl;
+  if (throttlelr[0] > 0) {
+    blockPWM(0, (posl+5) % 6, &weakul, &weakvl, &weakwl);
+  } else {
+    blockPWM(-0, (posl+1) % 6, &weakul, &weakvl, &weakwl);
+  }
+  ul += weakul;
+  vl += weakvl;
+  wl += weakwl;
+
+  int weakur, weakvr, weakwr;
+  if (throttlelr[1] > 0) {
+    blockPWM(0, (posr+5) % 6, &weakur, &weakvr, &weakwr);
+  } else {
+    blockPWM(-0, (posr+1) % 6, &weakur, &weakvr, &weakwr);
+  }
+  ur += weakur;
+  vr += weakvr;
+  wr += weakwr;
+
+  LEFT_TIM->LEFT_TIM_U = CLAMP(ul + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_V = CLAMP(vl + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_W = CLAMP(wl + pwm_res / 2, 10, pwm_res-10);
+
+  RIGHT_TIM->RIGHT_TIM_U = CLAMP(ur + pwm_res / 2, 10, pwm_res-10);
+  RIGHT_TIM->RIGHT_TIM_V = CLAMP(vr + pwm_res / 2, 10, pwm_res-10);
+  RIGHT_TIM->RIGHT_TIM_W = CLAMP(wr + pwm_res / 2, 10, pwm_res-10);
+}
+
+void enable_fauth(){
+  timer_brushless = fauth_brushless_control;
+}
+
+// end fauth
+
+
+void calibration_func();  // for correct var accessing and do not set to public
 
 void stop_buzzer(){
   buzzerFunc = nullFunc;
@@ -322,9 +464,6 @@ void calibration_func(){
   else
     timer_brushless = sensored_brushless_countrol;
 }
-void enable_fauth(){
-  timer_brushless = fauth_brushless_control;
-}
 
 void set_bldc_motors(bool enable){
   if(timer_brushless != calibration_func){  // if calibration is running do NOT enable Brushless motors
@@ -344,14 +483,14 @@ void set_bldc_motors(bool enable){
 
 void set_throttle(int left,int right){  // get set access for the throttle and switchin the direction of one motor
 #if defined(INVERT_L_DIRECTION)  // for other hardware needs this function to be rewritten
-  throttlelr[0] = CLAMP(-left,-1000,1000);
+  throttlelr[0] = -left;
 #else
   throttlelr[0] = CLAMP(left,-1000,1000);
 #endif
 #if defined(INVERT_R_DIRECTION)
-  throttlelr[1] = CLAMP(-right,-1000,1000);
+  throttlelr[1] = -right,-1000,1000);
 #else
-  throttlelr[1] = CLAMP(right,-1000,1000);
+  throttlelr[1] = right;
 #endif
 }
 
