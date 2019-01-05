@@ -10,7 +10,7 @@ extern uint8_t last_pos[2];
 extern int phase_period[2];
 extern int blockcurlr[2];
 
-extern float batteryVoltage;
+extern uint32_t battery_voltage;
 
 extern volatile WeakingPtr currentWeaking;
 
