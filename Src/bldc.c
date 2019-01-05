@@ -322,6 +322,9 @@ void calibration_func(){
   else
     timer_brushless = sensored_brushless_countrol;
 }
+void enable_fauth(){
+  timer_brushless = fauth_brushless_control;
+}
 
 void set_bldc_motors(bool enable){
   if(timer_brushless != calibration_func){  // if calibration is running do NOT enable Brushless motors
