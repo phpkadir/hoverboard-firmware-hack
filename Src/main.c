@@ -120,13 +120,14 @@ int main(void) {
       LCD_SetLocation(&lcd, 0, 1);
       LCD_WriteString(&lcd, "Initializing...");
     #endif
-    set_weaking(2);
 
     load_eeprom();  // initialize variables from eeprom or initialize them
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
+    set_weaking(2);
     set_bldc_motors(true);
   }
   int tmp_trottle[2] = {0,0};
+  main_loop: // a bit dirty :)
   while(1) {
     HAL_Delay(3);
     // ####### larsm's bobby car code #######
@@ -141,7 +142,7 @@ int main(void) {
       set_buzzer(reverseSound);
     }
     #endif
-    tmp_trottle[0] = tmp_trottle[1] = 50;
+    tmp_trottle[0] = tmp_trottle[1] = 300;
     set_throttle(tmp_trottle[0],tmp_trottle[1]);
     
     //START FINAL CODE
@@ -192,6 +193,7 @@ int main(void) {
       turnOff();
     }
   }
+  goto main_loop;
 }
 
 inline void swp(int* x,int* y){

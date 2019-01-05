@@ -93,7 +93,8 @@ else {\
   weakl = 0;\
   weakr = 0;
 
-#define BEEPS_BACKWARD
+//#define BEEPS_BACKWARD
+//#define TIMING_ENABLE
 #define  PWM_MIN 0
 #define PWM_MAX 1000
 #define PWM_REVERSE_MAX -300

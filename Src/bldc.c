@@ -10,7 +10,7 @@
 #include "buzzertones.h"
 #include "timing.h"
 
-const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
+#define pwm_res (64000000 / 2 / PWM_FREQ) /* 2000 */
 
 const uint8_t hall2pos[2][2][2] = {  // unchecked
   {
@@ -220,7 +220,9 @@ volatile int blockcurlr[2];  // Current for sensorles bldc
 volatile int internal_phase_period[2];  // For internal calculations only  PRIVATE NOT IN C HEADER
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
+#ifdef TIMING_ENABLE
 volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the timing of the motor (to prebuild the electric fields)
+#endif
 
 uint8_t next_pos(uint8_t oldpos, int8_t direction){
   switch(direction){
@@ -240,8 +242,10 @@ void sensored_brushless_countrol(){
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
     //set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
-    set_tim_lr[x](x);  // a bit dirty but for a test ok :)
-    uint8_t timing_pos, real_pos = get_pos[x];
+    set_tim_lr[x](true); // ok for testing
+    uint8_t real_pos = get_pos[x];
+    #ifdef TIMING_ENABLE
+    uint8_t timing_pos;
     if(currentTiming(internal_phase_period[x],
         timer[x],
         throttlelr[x]))
@@ -249,6 +253,9 @@ void sensored_brushless_countrol(){
         SIGN(internal_phase_period[x]));
     else
       timing_pos = real_pos;  // ifdef true end else else its always calced
+    #else
+    #define timing_pos real_pos
+    #endif
     RetValWeak tmp = currentWeaking(throttlelr[x],
       internal_phase_period[x],
       timer[x],
@@ -281,46 +288,6 @@ void sensored_brushless_countrol(){
   }
 }
 
-//Sensorless Control
-
-void sensorless_brushless_countrol(){  // TODO: Only currentdriven control because the suckers doesnt have the voltage sensors
-  //PWM part
-  int phase[3];
-  int wphase[3];
-  //update PWM channels based on position
-  for(int x = 0; x < 2; x++){
-    uint8_t pos;
-    int tmp_phase_current;
-    blockPhaseCurrent(last_pos[x],
-      adc_array[3-2*x] - adc_offset[3-2*x],
-      adc_array[4-2*x] - adc_offset[4-2*x],
-      &tmp_phase_current);  // Block Phase current for sensorless bldc control
-    set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
-    if(tmp_phase_current < blockcurlr[x])  // check for an phase change TODO need an goot algorythom
-      pos = next_pos(last_pos[x], SIGN(throttlelr[x]));  // needs to be calced
-    else
-      pos = last_pos[x];
-    RetValWeak tmp = currentWeaking(throttlelr[x], phase_period[x],timer[x],currentlr[x]);
-    blockPWM(tmp.pwm, pos, &phase[0], &phase[1], &phase[2]);
-    blockPWM(tmp.weak, (pos+(tmp.pwm > 0?5:1)) % 6, &wphase[0], &wphase[1], &wphase[2]);
-    for(int y = 0; y < 3; y++)
-      phase[y] += wphase[y];
-    set_motor[x](phase);
-    //speed measurung
-    timer[x]++;
-    if(last_pos[x] != pos){
-      if(next_pos(last_pos[x],1) == pos)
-        set_phase_lr[x](timer[x]);
-      else
-        set_phase_lr[x](-timer[x]);
-      timer[x] = 0;
-      last_pos[x] = pos;
-    } else if(timer[x] > abs(phase_period[x]))
-      set_phase_lr[x](SIGN(phase_period[x])*timer[x]);
-  }
-}
-//end Sensorless Control
-
 void calibration_func();  // for correct var accessing and do not set to public
 
 typedef void (*IsrPtr)();
@@ -333,6 +300,7 @@ void stop_buzzer(){
 }
 
 void bldc_start_calibration(){
+  mainCounter = 0;
   timer_brushless = calibration_func;
 }
 
