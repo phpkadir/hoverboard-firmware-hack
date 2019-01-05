@@ -142,8 +142,8 @@ int main(void) {
       set_buzzer(reverseSound);
     }
     #endif
-    //tmp_trottle[0] = tmp_trottle[1] = 150;
-    set_throttle(150,150);
+    
+    set_throttle((adc_buffer.l_tx2-ADC_MID)/2,(adc_buffer.l_rx2-ADC_MID)/2);
     
     //START FINAL CODE
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
