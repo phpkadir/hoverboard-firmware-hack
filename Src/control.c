@@ -18,6 +18,23 @@ uint8_t i2cBuffer[2];
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
 
+
+ //BETA V0.1 WORKING
+void turnOff(){
+  //save data
+  //i2c send turnoff commmand
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+  while(1);
+}
+
+ //BETA V0.1 WORKING
+void turnOffWithReset(){
+  //i2c send reset+turnoff command
+  //reset data for new init
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+  while(1);
+}
+
 #ifdef CONTROL_PPM
 uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
 uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};

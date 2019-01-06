@@ -39,20 +39,6 @@ void SystemClock_Config(void);
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
 
- //BETA V0.1 WORKING
-void turnOff(){
-  //save data
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  while(1);
-}
-
- //BETA V0.1 WORKING
-void turnOffWithReset(){
-  //reset data for new init
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  while(1);
-}
-
 int main(void) {
   {
     HAL_Init();
