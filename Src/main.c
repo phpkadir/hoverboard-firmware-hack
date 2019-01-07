@@ -39,8 +39,7 @@ void SystemClock_Config(void);
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
 
-int main(void) {
-  {
+void init(){
     HAL_Init();
     __HAL_RCC_AFIO_CLK_ENABLE();
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
@@ -111,9 +110,12 @@ int main(void) {
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
     set_weaking(2);
     set_bldc_motors(true);
-  }
+}
+
+#ifndef OVERRIDE_MAIN
+int main(void) {
+  init();
   int tmp_trottle[2] = {0,0};
-  main_loop: // a bit dirty :)
   while(1) {
     HAL_Delay(3);
     // ####### larsm's bobby car code #######
@@ -197,8 +199,8 @@ int main(void) {
       current_limit = 15;  // limiting the motorcurrent
     }
   }
-  goto main_loop;
 }
+#endif
 
 inline void swp(int* x,int* y){
 	int tmp = *x;
