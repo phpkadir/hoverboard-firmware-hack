@@ -8,7 +8,6 @@
 #include "config.h"
 #include "weaking.h"
 #include "buzzertones.h"
-#include "timing.h"
 
 #define pwm_res (64000000 / 2 / PWM_FREQ) /* 2000 */
 
@@ -277,25 +276,27 @@ void sensored_brushless_countrol(){
   int wphase[3];
   //update PWM channels based on position
   for(int x = 0; x < 2; x++){
+    uint8_t real_pos = get_pos[x](), timing_pos;
+    timer[x]++;
+    if(last_pos[x] != real_pos){
+      if(next_pos(last_pos[x],1) == real_pos)
+        set_phase_lr[x](internal_phase_period[x] = timer[x]);
+      else
+        set_phase_lr[x](internal_phase_period[x] = -timer[x]);
+      timer[x] = 0;
+      last_pos[x] = real_pos;
+    } else if(timer[x] > abs(internal_phase_period[x]))
+      set_phase_lr[x](internal_phase_period[x] = SIGN(internal_phase_period[x])*timer[x]);
     set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
-    //set_tim_lr[x](true); // ok for testing
-    uint8_t real_pos = get_pos[x]();
-    #ifdef TIMING_ENABLE
-    uint8_t timing_pos;
-    if(currentTiming(internal_phase_period[x],
-        timer[x],
-        throttlelr[x]))
-      timing_pos = next_pos(real_pos,
-        SIGN(internal_phase_period[x]));
-    else
-      timing_pos = real_pos;  // ifdef true end else else its always calced
-    #else
-    #define timing_pos real_pos
-    #endif
     RetValWeak tmp = currentWeaking(throttlelr[x],
       internal_phase_period[x],
       timer[x],
       currentlr[x]);
+    if(tmp.timing)
+      timing_pos = next_pos(real_pos,
+        SIGN(internal_phase_period[x]));
+    else
+      timing_pos = real_pos;
     blockPWM(tmp.pwm,
       timing_pos,
       &phase[0],
@@ -309,17 +310,6 @@ void sensored_brushless_countrol(){
     for(int y = 0; y < 3; y++)
       phase[y] += wphase[y];
     set_motor[x](phase);
-    //speed measurung
-    timer[x]++;
-    if(last_pos[x] != real_pos){
-      if(next_pos(last_pos[x],1) == real_pos)
-        set_phase_lr[x](internal_phase_period[x] = timer[x]);
-      else
-        set_phase_lr[x](internal_phase_period[x] = -timer[x]);
-      timer[x] = 0;
-      last_pos[x] = real_pos;
-    } else if(timer[x] > abs(internal_phase_period[x]))
-      set_phase_lr[x](internal_phase_period[x] = SIGN(internal_phase_period[x])*timer[x]);
     blockPhaseCurrent(last_pos[x], adc_array[3-2*x] - adc_offset[3-2*x], adc_array[4-2*x] - adc_offset[4-2*x], &blockcurlr[x]); //Old shitty code
   }
 }

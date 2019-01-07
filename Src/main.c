@@ -119,7 +119,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
   int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(3);
-    // ####### larsm's bobby car code #######
+    // ####### BobbyIndustrial code #######
     calc_torque_per_wheel(
       calc_torque(
         clean_adc(virtual_ival[0][0]),

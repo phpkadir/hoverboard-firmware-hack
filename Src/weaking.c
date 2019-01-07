@@ -7,23 +7,23 @@
 #include "config.h"
 
 RetValWeak longRange (int torque, unsigned int period, unsigned int cur_phase, int current){
-  return (RetValWeak){ .pwm  = torque, .weak = 0};
+  return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = false};
 }
 RetValWeak STVO6kmh(int torque, unsigned int period, unsigned int cur_phase, int current){
-  return (RetValWeak){ .pwm  = torque/8, .weak = 0};
+  return (RetValWeak){ .pwm  = torque/8, .weak = 0,  .timing = false};
 }
 
 RetValWeak nullFuncWeak(int torque, unsigned int period, unsigned int cur_phase, int current){
-  return (RetValWeak){ .pwm  = 0, .weak = 0};
+  return (RetValWeak){ .pwm  = 0, .weak = 0, .timing = false};
 }
 RetValWeak fastMode(int torque, unsigned int period, unsigned int cur_phase, int current){//todo same algorythmus than optweaking but less agressive and more efficient
   if(torque>950 && period < 0)
-    return (RetValWeak){ .pwm  = PWM_MAX, .weak = WEAKING_PWM_MAX};
+    return (RetValWeak){ .pwm  = PWM_MAX, .weak = WEAKING_PWM_MAX, .timing = false};
   else
-    return (RetValWeak){ .pwm  = torque, .weak = 0};
+    return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = false};
 }
 RetValWeak optWeaking(int torque, unsigned int period, unsigned int cur_phase, int current){//todo
-  return (RetValWeak){ .pwm  = PWM_MAX, .weak = 0};
+  return (RetValWeak){ .pwm  = PWM_MAX, .weak = 0, .timing = false};
 }
 
 const WeakStruct weakfunctions[] = {

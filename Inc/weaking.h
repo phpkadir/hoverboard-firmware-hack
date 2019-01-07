@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct {int pwm; int weak;} RetValWeak;
+typedef struct {int pwm; int weak; bool timing;} RetValWeak;
 typedef RetValWeak (*WeakingPtr)(int torque, unsigned int period, unsigned int cur_phase, int current);
 typedef struct {WeakingPtr func; const char* name; unsigned int cur_limit;} WeakStruct;
 RetValWeak nullFuncWeak(int pwm, unsigned int period, unsigned int cur_phase, int current);

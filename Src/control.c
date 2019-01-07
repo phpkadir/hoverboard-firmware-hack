@@ -9,7 +9,6 @@
 #include "config.h"
 #include "bldc.h"
 #include "weaking.h"
-#include "timing.h"
 #include "buzzertones.h"
 
 TIM_HandleTypeDef TimHandle;
@@ -51,7 +50,6 @@ void fallback_defect_latch(){
 void turnOff(){
   set_bldc_motors(false);
   set_timing(0);
-  set_weaking(0);
   //save data
   //i2c send turnoff commmand
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
@@ -62,7 +60,6 @@ void turnOff(){
 void turnOffWithReset(){
   set_bldc_motors(false);
   set_timing(0);
-  set_weaking(0);
   //i2c send reset+turnoff command
   //reset data for new init
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
