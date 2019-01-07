@@ -73,8 +73,6 @@
 #define INVERT_R_DIRECTION
 #endif // INVERT_R_DIRECTION
 
-#define I2C_MASTER
-
 //Turbo boost at high speeds while button1 is pressed:
 // ###### BOBBYCAR ######
 // #define FILTER              0.1
@@ -86,14 +84,7 @@
 // #define SPEED_COEFFICIENT   0.5
 // #define STEER_COEFFICIENT   -0.2
 
-// #define ADDITIONAL_CODE if (button1 && scale > 0.8) { /* field weakening at high speeds */ \
-  weakl = speedL - 600; /* weak should never exceed 400 or 450 MAX!! */ \
-  weakr = speedR - 600; } \
-else {\
-  weakl = 0;\
-  weakr = 0;
-
-//#define BEEPS_BACKWARD
+#define BEEPS_BACKWARD
 //#define TIMING_ENABLE
 #define  PWM_MIN 0
 #define PWM_MAX 1000

@@ -1,0 +1,2 @@
+#ifdef I2C_MASTER
+#undef I2C_MASTER
