@@ -9,15 +9,12 @@
 #define BAT_CALIB_ADC                 1704       // adc-value measured by mainboard (value nr 5 on UART debug output)
 #define DEAD_ZONE 64
 
-#define DC_CUR_LIMIT     25         // Motor DC current limit in amps. it does not disable motors, it is a soft current limit.
-
 #define BAT_CELL_CNT     10.0
 #define BAT_FULL_CELL    4.2
 #define BAT_RATED_CELL   3.7
 #define BAT_LOW1_CELL    3.5
 #define BAT_LOW2_CELL    3.2
-#define BAT_LOW_DEAD_CELL 3.0
-#define FEALD_WEAKENING_MAX 40
+#define BAT_LOW_DEAD_CELL 3.1
 // ################################################################################
 
 #define DEBUG_SERIAL_USART3         // left sensor board cable, disable if ADC or PPM is used!
@@ -56,39 +53,15 @@
 
 // ###### DRIVING BEHAVIOR ######
 
-// inputs:
-// - cmd1 and cmd2: analog normalized input values. -1000 to 1000
-// - button1 and button2: digital input values. 0 or 1
-// - adc_buffer.l_tx2 and adc_buffer.l_rx2: unfiltered ADC values (you do not need them). 0 to 4095
-// outputs:
-// - speedR and speedL: normal driving -1000 to 1000
-// - weakr and weakl: field weakening for extra boost at high speed (speedR > 700 and speedL > 700). 0 to ~400
-
-#define FILTER              0.1  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
-#define SPEED_COEFFICIENT   0.5  // higher value == stronger. 0.0 to 1.0
-#define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
-
 #define INVERT_L_DIRECTION
 #if !defined(INVERT_L_DIRECTION)
 #define INVERT_R_DIRECTION
 #endif // INVERT_R_DIRECTION
 
-//Turbo boost at high speeds while button1 is pressed:
-// ###### BOBBYCAR ######
-// #define FILTER              0.1
-// #define SPEED_COEFFICIENT   -1
-// #define STEER_COEFFICIENT   0
-
-// ###### ARMCHAIR ######
-// #define FILTER              0.05
-// #define SPEED_COEFFICIENT   0.5
-// #define STEER_COEFFICIENT   -0.2
-
 #define BEEPS_BACKWARD
-//#define TIMING_ENABLE
 #define  PWM_MIN 0
-#define PWM_MAX 1000
-#define PWM_REVERSE_MAX -300
+#define PWM_MAX (PWM_RES / 2)
+#define PWM_REVERSE_MAX (-(PWM_MAX * 3 / 10)) 
 #define WEAKING_PWM_MAX 450
 #define THROTTLE_MAX 1000
 // ################################################################################

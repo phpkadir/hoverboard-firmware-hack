@@ -9,8 +9,6 @@
 #include "weaking.h"
 #include "buzzertones.h"
 
-#define pwm_res (64000000 / 2 / PWM_FREQ) /* 2000 */
-
 const uint8_t hall2pos[2][2][2] = {  // unchecked
   {
     {
