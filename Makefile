@@ -1,15 +1,15 @@
 ######################################
 # target
 ######################################
-TARGET = hover
+TARGET = hover  # Devicefoldername+deviceconfig*
 
 ######################################
 # building variables
 ######################################
 # debug build?
-DEBUG = 1
+DEBUG = 0
 # optimization
-OPT = -Og
+OPT = -O3
 
 # Build path
 BUILD_DIR = build
@@ -97,7 +97,9 @@ C_INCLUDES =  \
 -IDrivers/STM32F1xx_HAL_Driver/Inc \
 -IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
--IDrivers/CMSIS/Include
+-IDrivers/CMSIS/Include\
+#-IDevices/* TODO include devices folder and force include one device_config*.h
+#name buildfile Devicefoldername+deviceconfig*
 
 
 # compile gcc flags
