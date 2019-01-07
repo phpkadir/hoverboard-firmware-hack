@@ -114,7 +114,7 @@ void init(){
 
 #ifndef OVERRIDE_MAIN
 int main(void) {
-main_start:
+main_start:  // only for defect boards if you think your hardware is working please remove
   init();
   int tmp_trottle[2] = {0,0};
   while(1) {
@@ -203,7 +203,7 @@ main_start:
       current_limit = 15;  // limiting the motorcurrent
     }
   }
-  goto main_start;
+  goto main_start;  // if this goto is used the board is defect and everybody knows: "Defect boards are liking defect code" :D
 }
 #endif
 
