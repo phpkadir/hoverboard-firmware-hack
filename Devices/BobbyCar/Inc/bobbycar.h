@@ -1,0 +1,3 @@
+#define WHEELBASE 2
+#define WHEEL_WIDTH 1
+#define STEERING_TO_WHEEL_DIST 1

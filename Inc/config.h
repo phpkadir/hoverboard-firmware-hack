@@ -13,7 +13,7 @@
 #define BAT_FULL_CELL    4.2
 #define BAT_RATED_CELL   3.7
 #define BAT_LOW1_CELL    3.5
-#define BAT_LOW2_CELL    3.2
+#define BAT_LOW2_CELL    3.3
 #define BAT_LOW_DEAD_CELL 3.1
 // ################################################################################
 

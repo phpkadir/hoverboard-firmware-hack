@@ -119,35 +119,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
   int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(3);
-    // ####### BobbyIndustrial code #######
-    calc_torque_per_wheel(
-      calc_torque(
-        clean_adc(virtual_ival[0][0]),
-        clean_adc(virtual_ival[0][1])),
-      clean_adc(virtual_ival[1][0]),
-      tmp_trottle);
-    #ifdef BEEPS_BACKWARD
-    if(tmp_trottle[0] + tmp_trottle[1] < 0){
-      set_buzzer(reverseSound);
-    }
-    #endif
-
-    int turn = (adc_buffer.l_rx2 - ADC_MID) / 8;
-    int speed = (adc_buffer.l_tx2 - ADC_MID) / 4;
-
-    if (ABS(turn) < 4) {
-      turn = 0;
-    } else {
-      turn -= 4 * SIGN(turn);
-    }
-
-    if (ABS(speed) < 5) {
-      speed = 0;
-    }
-
-    set_throttle(speed + turn, speed - turn);
-      // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
-      // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
+    device_specific();
 
     //START FINAL CODE
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
