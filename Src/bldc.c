@@ -355,6 +355,10 @@ void calibration_func(){
     timer_brushless = sensored_brushless_countrol;
 }
 
+void blink_led(){
+  HAL_GPIO_WritePin(LED_PORT, LED_PIN, mainCounter/PWM_FREQ%2);
+}
+
 void set_bldc_motors(bool enable){
   if(timer_brushless != calibration_func){  // if calibration is running do NOT enable Brushless motors
     if(enable) {
@@ -369,6 +373,10 @@ void set_bldc_motors(bool enable){
       }
     }
   }
+}
+
+void set_bldc_to_led(){
+  timer_brushless = blink_led;
 }
 
 void set_throttle(int left,int right){  // get set access for the throttle and switchin the direction of one motor

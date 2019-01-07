@@ -5,3 +5,4 @@
 
 typedef bool (*TimingPtr)(int lst_phase, int cur_phase, int throttle);
 bool no_timing(int lst_phase, int cur_phase, int throttle);
+void set_timing(int x);

@@ -7,6 +7,10 @@
 #include "setup.h"
 #include "control.h"
 #include "config.h"
+#include "bldc.h"
+#include "weaking.h"
+#include "timing.h"
+#include "buzzertones.h"
 
 TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
@@ -18,21 +22,51 @@ uint8_t i2cBuffer[2];
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
 
+void fallback_defect_latch(){
+  stop_buzzer();
+  set_bldc_to_led();
+  while(1)
+    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
+      bool btn_release = false;
+      unsigned long startTime = get_mainCounter();
+      set_bldc_motors(false);
+      while(get_mainCounter() < (startTime + (PWM_FREQ / 5))){  // check button for 0.2s for release to only turn off if its pressed for 2 secs
+        if(!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){  // if button released
+          btn_release = true;
+          break;
+        }
+      }
+      if(btn_release){
+        set_buzzer(buttonRelease);
+        set_bldc_motors(true);
+        // do something
+      }
+      else{
+        break;
+      }
+    }
+}
 
  //BETA V0.1 WORKING
 void turnOff(){
+  set_bldc_motors(false);
+  set_timing(0);
+  set_weaking(0);
   //save data
   //i2c send turnoff commmand
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  while(1);
+  fallback_defect_latch();
 }
 
  //BETA V0.1 WORKING
 void turnOffWithReset(){
+  set_bldc_motors(false);
+  set_timing(0);
+  set_weaking(0);
   //i2c send reset+turnoff command
   //reset data for new init
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  while(1);
+  fallback_defect_latch();
 }
 
 #ifdef CONTROL_PPM

@@ -114,6 +114,7 @@ void init(){
 
 #ifndef OVERRIDE_MAIN
 int main(void) {
+main_start:
   init();
   int tmp_trottle[2] = {0,0};
   while(1) {
@@ -174,10 +175,12 @@ int main(void) {
         }  // wait for button release to turn off
         if(btn_release) {
           turnOff();
+          break;
         } else {
           set_buzzer(resetSound);
           while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));
           turnOffWithReset();
+          break;
         }
       }
     }
@@ -188,6 +191,7 @@ int main(void) {
       set_bldc_motors(false);
       HAL_Delay(200);
       turnOff();
+      break;
     }
     else if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2)) {
       set_buzzer(lowBattery2);
@@ -199,6 +203,7 @@ int main(void) {
       current_limit = 15;  // limiting the motorcurrent
     }
   }
+  goto main_start;
 }
 #endif
 
