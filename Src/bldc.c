@@ -146,14 +146,14 @@ volatile uint32_t battery_voltage = 1704<<10;// done use int
 
 typedef void (*setMotorType)(int *hPhase);
 void set_motor_r(int *hPhase){
-  RIGHT_TIM->RIGHT_TIM_U = CLAMP(hPhase[0] + pwm_res / 2, 10, pwm_res-10);
-  RIGHT_TIM->RIGHT_TIM_V = CLAMP(hPhase[1] + pwm_res / 2, 10, pwm_res-10);
-  RIGHT_TIM->RIGHT_TIM_W = CLAMP(hPhase[2] + pwm_res / 2, 10, pwm_res-10);
+  RIGHT_TIM->RIGHT_TIM_U = CLAMP(hPhase[0] + PWM_RES / 2, 10, PWM_RES-10);
+  RIGHT_TIM->RIGHT_TIM_V = CLAMP(hPhase[1] + PWM_RES / 2, 10, PWM_RES-10);
+  RIGHT_TIM->RIGHT_TIM_W = CLAMP(hPhase[2] + PWM_RES / 2, 10, PWM_RES-10);
 }
 void set_motor_l(int *hPhase){
-  LEFT_TIM->LEFT_TIM_U = CLAMP(hPhase[0] + pwm_res / 2, 10, pwm_res-10);
-  LEFT_TIM->LEFT_TIM_V = CLAMP(hPhase[1] + pwm_res / 2, 10, pwm_res-10);
-  LEFT_TIM->LEFT_TIM_W = CLAMP(hPhase[2] + pwm_res / 2, 10, pwm_res-10);
+  LEFT_TIM->LEFT_TIM_U = CLAMP(hPhase[0] + PWM_RES / 2, 10, PWM_RES-10);
+  LEFT_TIM->LEFT_TIM_V = CLAMP(hPhase[1] + PWM_RES / 2, 10, PWM_RES-10);
+  LEFT_TIM->LEFT_TIM_W = CLAMP(hPhase[2] + PWM_RES / 2, 10, PWM_RES-10);
 }
 const setMotorType set_motor[2] = { //array for loop
   set_motor_l,
