@@ -2,7 +2,7 @@ before-install:
   - git submodule init
   - git submodule update
 install:
-  - sudo apt-get install build-essentials cmake openocd gtk+-3.0 libusb-1.0-0-dev
+  - sudo apt-get install build-essential cmake openocd gtk+-3.0 libusb-1.0-0-dev
 script:
   - make
 
