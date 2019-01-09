@@ -80,3 +80,9 @@ void resetSound(){
             create_buzzer_wave(curBuzzTime, 8);
     }
 }
+
+const void* lowBatTones[]={
+    lowBattery3,
+    lowBattery2,
+    lowBattery1
+};

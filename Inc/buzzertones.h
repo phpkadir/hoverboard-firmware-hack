@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern const void* lowBatTones[];
+
 void set_buzzerStart(unsigned long mainCnt);
 
 void lowBattery1();

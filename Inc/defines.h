@@ -155,7 +155,7 @@
 #define BATTERY_VOLTAGE2ADC12(x) (uint32_t)((float)((float)x / ((float)BAT_CALIB_REAL_VOLTAGE / (float)BAT_CALIB_ADC))*1024.0f)
 
 #define PWM_RES (64000000 / 2 / PWM_FREQ) /* 2000 */
-
+#define LIMIT_CURRENT(x) if(current_limit > x) current_limit = x;
 typedef struct {
   uint16_t rr1;
   uint16_t rr2;

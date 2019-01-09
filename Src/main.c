@@ -30,6 +30,7 @@
 #include "config.h"  // the config
 #include "comms.h"
 #include "control.h"
+#include "generic_device.h"
 
 void SystemClock_Config(void);
 
@@ -65,6 +66,14 @@ void device_init(){
   set_weaking(2);
 }
 
+//for linking boost ups buildtime
+const uint32_t lowBattery[] = {
+  BATTERY_VOLTAGE2ADC12(BAT_LOW_DEAD),
+  BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2),
+  BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL1)
+};
+
+const uint32_t lowBattery_length = 3;
 
 
 
@@ -187,22 +196,19 @@ main_start:  // only for defect boards if you think your hardware is working ple
     }
 
     //END FINAL CODE
-    if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_DEAD)) {
+    if  (battery_voltage < lowBattery[0]) {
       set_buzzer(lowBattery3);
       set_bldc_motors(false);
       HAL_Delay(200);
       turnOff();
       break;
     }
-    else if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2)) {
-      set_buzzer(lowBattery2);
-      current_limit = 10;  // limiting the motorcurrent to a lower value
-    }
-
-    else if (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL1)) {
-      set_buzzer(lowBattery1);
-      current_limit = 15;  // limiting the motorcurrent
-    }
+    for(uint8_t x=1;x<lowBattery_length;x++)
+      if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2)) {
+        set_buzzer(lowBatTones[x]);
+        LIMIT_CURRENT(5 + 5*x);  // limiting the motorcurrent to a lower value
+        break;
+      }
   }
   goto main_start;  // if this goto is used the board is defect and everybody knows: "Defect boards are liking defect code" :D
 }
