@@ -7,24 +7,27 @@
 #define DEAD_TIME        16         // PWM deadtime        default 32
 #define BAT_CALIB_REAL_VOLTAGE        43.0       // input voltage measured by multimeter
 #define BAT_CALIB_ADC                 1704       // adc-value measured by mainboard (value nr 5 on UART debug output)
-#define DEAD_ZONE 64
 
+//device specific
+#define DEAD_ZONE 64
 #define BAT_CELL_CNT     10.0
 #define BAT_FULL_CELL    4.2
 #define BAT_RATED_CELL   3.7
 #define BAT_LOW1_CELL    3.5
 #define BAT_LOW2_CELL    3.3
 #define BAT_LOW_DEAD_CELL 3.1
+#define PWM_REVERSE_MAX (-(PWM_MAX * 3 / 10))
+#define BEEPS_BACKWARD
 // ################################################################################
 
-#define DEBUG_SERIAL_USART3         // left sensor board cable, disable if ADC or PPM is used!
+//#define DEBUG_SERIAL_USART3         // left sensor board cable, disable if ADC or PPM is used!
 //#define DEBUG_SERIAL_USART3         // right sensor board cable, disable if I2C (nunchuck) is used!
-#define DEBUG_BAUD       115200     // UART baud rate
+//#define DEBUG_BAUD       115200     // UART baud rate
 //#define DEBUG_SERIAL_SERVOTERM
-#define DEBUG_SERIAL_ASCII          // human readable output. i.e. "345;1337;0;0\n\r"
+//#define DEBUG_SERIAL_ASCII          // human readable output. i.e. "345;1337;0;0\n\r"
 
-#define CONTROL_SERIAL_USART2
-#define CONTROL_BAUD       19200     // control via usart from eg an Arduino or raspberry
+//#define CONTROL_SERIAL_USART2
+//#define CONTROL_BAUD       19200     // control via usart from eg an Arduino or raspberry
 // for Arduino, use void loop(void){ Serial.write((uint8_t *) &steer, sizeof(steer)); Serial.write((uint8_t *) &speed, sizeof(speed));delay(20); }
 
 //#define DEBUG_I2C_LCD               // standard 16x2 or larger text-lcd via i2c-converter on right sensor board cable
@@ -58,10 +61,8 @@
 #define INVERT_R_DIRECTION
 #endif // INVERT_R_DIRECTION
 
-#define BEEPS_BACKWARD
 #define  PWM_MIN 0
 #define PWM_MAX (PWM_RES / 2)
-#define PWM_REVERSE_MAX (-(PWM_MAX * 3 / 10)) 
 #define WEAKING_PWM_MAX 450
 #define THROTTLE_MAX 1000
 #define PERIOD6KMH 100
