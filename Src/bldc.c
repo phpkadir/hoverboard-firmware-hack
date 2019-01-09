@@ -1,6 +1,7 @@
 //ALPHA V0.1
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>
 #include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"

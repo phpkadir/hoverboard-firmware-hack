@@ -1,6 +1,6 @@
 #include "bobbycar.h"
 void device_specific(){
-    int tmp_trottle[2]
+    int tmp_trottle[2];
     calc_torque_per_wheel(
       calc_torque(
         clean_adc(virtual_ival[0][0]),

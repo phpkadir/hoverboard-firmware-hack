@@ -12,6 +12,11 @@ void set_buzzerStart(unsigned long mainCnt){
     buzzerStart = mainCnt;
 }
 
+void create_buzzer_wave(unsigned long hTime, int freq){
+    if(hTime % freq)
+        HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+}
+
 void lowBattery1(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
     if(!((curBuzzTime / (PWM_FREQ / 3)) % 2))
@@ -44,11 +49,6 @@ void shutDownSound(){
         create_buzzer_wave(curBuzzTime, (curBuzzTime / (PWM_FREQ / 10)) + 1);  // 8-1khz 1khz step
     else
         stop_buzzer();
-}
-
-void create_buzzer_wave(unsigned long hTime, int freq){
-    if(hTime % freq)
-        HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 }
 
 void reverseSound(){

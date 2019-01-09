@@ -154,11 +154,9 @@ main_start:  // only for defect boards if you think your hardware is working ple
   init();
   device_init();
   set_bldc_motors(true);
-  int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(3);
     device_specific();
-
     //START FINAL CODE
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {  // turnoff mechanism
       bool btn_release = false;
@@ -226,7 +224,7 @@ inline void sort_array(int x[],int cnt){
 				swp(&x[y],&x[z]);
 }
 int calc_median(int x[],int cnt){
-  sort_list(x,cnt);
+  sort_array(x,cnt);
 	if(cnt%2)
 		return x[cnt/2];
 	else
