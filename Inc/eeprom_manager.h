@@ -2,3 +2,5 @@
 #pragma once
 
 void load_eeprom();
+void save_eeprom();
+void reset_eeprom();

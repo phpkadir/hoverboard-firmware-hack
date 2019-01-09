@@ -50,7 +50,7 @@ void fallback_defect_latch(){
  //BETA V0.1 WORKING
 void turnOff(){
   set_bldc_motors(false);
-  //save data
+  save_eeprom();
   //i2c send turnoff commmand
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   fallback_defect_latch();
@@ -60,7 +60,7 @@ void turnOff(){
 void turnOffWithReset(){
   set_bldc_motors(false);
   //i2c send reset+turnoff command
-  //reset data for new init
+  reset_eeprom();
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   fallback_defect_latch();
 }

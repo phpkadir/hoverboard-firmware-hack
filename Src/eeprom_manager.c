@@ -2,7 +2,8 @@
 // not implemented
 #include <stdbool.h>
 #include <stdint.h>
-//#include "stm32f1xx_hal_flash.h"
+#include "stm32f1xx_hal.h"
+#include "stm32f1xx_hal_flash.h"
 #include "bldc.h"
 
 uint64_t get_eeprom_version(){
@@ -22,13 +23,22 @@ void set_eeprom_version(uint64_t version){
 
 }
 
-void reset_eeprom(){
-    // clean eeprom set version 0
-    set_eeprom_version(0);
-}
-
 void load_eeprom_v1(){
 
+}
+
+void save_eeprom_v1(){
+
+}
+
+const void (*eeprom_savers[])() = {
+    save_eeprom_v1
+};
+
+const int eeprom_savers_lenght = 1;
+
+void save_eeprom(){
+    eeprom_savers[eeprom_savers_lenght-1]();
 }
 
 void load_eeprom(){
@@ -53,7 +63,10 @@ void load_eeprom(){
     reset_eeprom();
 }
 
-
+void reset_eeprom(){
+    // clean eeprom set version 0
+    set_eeprom_version(0);
+}
 
 __attribute__ ((section(".persistent_variables")))
 volatile uint8_t persisten_mem[32*1024];
