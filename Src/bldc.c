@@ -1,4 +1,4 @@
-//ALPHA V0.1
+//FINAL V1.0
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
@@ -10,7 +10,7 @@
 #include "weaking.h"
 #include "buzzertones.h"
 
-const uint8_t hall2pos[2][2][2] = {  // unchecked
+const uint8_t hall2pos[2][2][2] = {
   {
     {
       2,
@@ -31,17 +31,6 @@ const uint8_t hall2pos[2][2][2] = {  // unchecked
       2
     }
   }
-};
-
-const uint8_t hall_to_pos[8] = {
-    0,
-    0,
-    2,
-    1,
-    4,
-    5,
-    3,
-    0,
 };
 
 inline void blockPWM(int pwm, int pos, int *u, int *v, int *w) {  // checked working
@@ -87,45 +76,24 @@ inline void blockPhaseCurrent(int pos, int u, int v, int *q) {  // unknown
   switch(pos) {
     case 0:
       *q = u - v;
-      // *u = 0;
-      // *v = pwm;
-      // *w = -pwm;
       break;
     case 1:
       *q = u;
-      // *u = -pwm;
-      // *v = pwm;
-      // *w = 0;
       break;
     case 2:
       *q = u;
-      // *u = -pwm;
-      // *v = 0;
-      // *w = pwm;
       break;
     case 3:
       *q = v;
-      // *u = 0;
-      // *v = -pwm;
-      // *w = pwm;
       break;
     case 4:
       *q = v;
-      // *u = pwm;
-      // *v = -pwm;
-      // *w = 0;
       break;
     case 5:
       *q = -(u - v);
-      // *u = pwm;
-      // *v = 0;
-      // *w = -pwm;
       break;
     default:
       *q = 0;
-      // *u = 0;
-      // *v = 0;
-      // *w = 0;
   }
 }
 
@@ -137,13 +105,23 @@ uint16_t adc_offset[6] = {  // offests as array for looping adc
   ADC_MID,
   ADC_MID
 };
+
 volatile unsigned long mainCounter = 0;  // global time incremented by interrupt
+volatile uint32_t battery_voltage = 1704<<10;// done use int
+volatile int phase_period[2];  // the measured speed in 1/x
+volatile unsigned int current_limit;  // dynamic Currentlimit
+volatile int currentlr[2];  // Current for cutoff
+volatile int throttlelr[2];  // throttle for calcing pwm and weakening
+volatile unsigned int timer[2];  // timer for speed measuring
+volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
+volatile int blockcurlr[2];  // Current for sensorles bldc
+volatile int internal_phase_period[2];  // For internal calculations only  PRIVATE NOT IN C HEADER
+
 
 unsigned long get_mainCounter(){
   return mainCounter;
 }
 
-volatile uint32_t battery_voltage = 1704<<10;// done use int
 
 typedef void (*setMotorType)(int *hPhase);
 void set_motor_r(int *hPhase){
@@ -160,33 +138,13 @@ const setMotorType set_motor[2] = { //array for loop
   set_motor_l,
   set_motor_r
 };
+
 uint8_t get_pos_l(){
-/*  uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
-  uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
-  uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
-
-  uint8_t halll = hall_ul * 1 + hall_vl * 2 + hall_wl * 4;
-  uint8_t posl          = hall_to_pos[halll];
-  posl += 2;
-  posl %= 6;
-  return posl;*/
-
   return hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)]
     [!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)]
       [!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
 }
 uint8_t get_pos_r(){
-/*  uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
-  uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
-  uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
-
-  uint8_t hallr = hall_ur * 1 + hall_vr * 2 + hall_wr * 4;
-  uint8_t posr          = hall_to_pos[hallr];
-  posr += 2;
-  posr %= 6;
-
-  return posr;*/
-
   return hall2pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)]
     [!(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN)]
       [!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
@@ -218,8 +176,6 @@ const SetBoolFunc set_tim_lr[2] = {  // disable/enable motors
 
 void nullFunc(){}  // Function for empty funktionpointer becasue Jump NULL != ret
 
-volatile int phase_period[2];  // the measured speed in 1/x
-
 typedef void (*SetPhaseType)(int phase);
 void set_phase_l(int phase){
 #if defined(INVERT_L_DIRECTION)  // for other hardware needs this function to be rewritten
@@ -241,13 +197,6 @@ const SetPhaseType set_phase_lr[2] = {  // disable/enable motors
   set_phase_r
 };
 
-volatile unsigned int current_limit;  // dynamic Currentlimit
-volatile int currentlr[2];  // Current for cutoff
-volatile int throttlelr[2];  // throttle for calcing pwm and weakening
-volatile unsigned int timer[2];  // timer for speed measuring
-volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
-volatile int blockcurlr[2];  // Current for sensorles bldc
-volatile int internal_phase_period[2];  // For internal calculations only  PRIVATE NOT IN C HEADER
 volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fealdweakening and pwm
 
 #ifdef TIMING_ENABLE

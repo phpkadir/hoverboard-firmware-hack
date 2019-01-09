@@ -37,11 +37,17 @@ To flash the STM32, use the ST-Flash utility (https://github.com/texane/stlink).
 If you never flashed your mainboard before, the STM is probably locked. To unlock the flash, use the following OpenOCD command:
 
 ```
-openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
+make unlock
 ```
+if it fails use
+```
+make fallback_unlock
+```
+if it doest work now use *Windows utility*
+
 Then you can simply flash the firmware:
 ```
-st-flash --reset write build/hover.bin 0x8000000
+make flash
 ```
 
 ---
@@ -62,6 +68,5 @@ Most robust way for input is to use the ADC and potis. It works well even on 1m 
 
 #### Examples
 
-Have a look at the config.h in the Inc directory. That's where you configure to firmware to match your project.
-Currently supported: Wii Nunchuck, analog potentiometer and PPM-Sum signal from a RC remote.
-If you need additional features like a boost button, have a look at the while(1) loop in the main.c
+We want support many projects like a longboard. our firmware will support variable sync with i2c and an i2c display PPM-Sum signal and ADC input
+It will get new fieldweakoning algorythm and a timing algorythm
