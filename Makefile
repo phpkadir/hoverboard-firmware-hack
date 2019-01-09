@@ -1,3 +1,5 @@
+
+.PHONY: all format clean flash unlock fallback_unlock
 ######################################
 # target
 ######################################
@@ -19,7 +21,7 @@ BUILD_DIR = build
 # source
 ######################################
 # C sources
-C_SOURCES =  \
+C_SOURCES_DRIVERS =  \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c \
@@ -36,6 +38,8 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c \
+
+C_SOURCES_GLOBAL = \
 Src/system_stm32f1xx.c \
 Src/setup.c \
 Src/control.c \
@@ -136,16 +140,21 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 # build the application
 #######################################
 # list of objects
-OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES)))
+HEADERS = $(wildcard Inc/*.h)
+OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES_DRIVERS:.c=.o)))
+vpath %.c $(sort $(dir $(C_SOURCES_DRIVERS)))
+
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES_GLOBAL:.c=.o)))
+vpath %.c $(sort $(dir $(C_SOURCES_GLOBAL)))
+
 # list of ASM program objects
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
-$(BUILD_DIR)/%.o: %.c Inc/config.h Makefile | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.c $(HEADERS) Makefile | $(BUILD_DIR)
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
-$(BUILD_DIR)/%.o: %.s Inc/config.h Makefile | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.s $(HEADERS) Makefile | $(BUILD_DIR)
 	$(AS) -c $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
