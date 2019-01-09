@@ -49,7 +49,6 @@ void fallback_defect_latch(){
  //BETA V0.1 WORKING
 void turnOff(){
   set_bldc_motors(false);
-  set_timing(0);
   //save data
   //i2c send turnoff commmand
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
@@ -59,7 +58,6 @@ void turnOff(){
  //BETA V0.1 WORKING
 void turnOffWithReset(){
   set_bldc_motors(false);
-  set_timing(0);
   //i2c send reset+turnoff command
   //reset data for new init
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
