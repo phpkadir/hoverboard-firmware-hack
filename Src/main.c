@@ -39,6 +39,35 @@ void SystemClock_Config(void);
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
 
+
+
+//rollbrett
+void device_specific(){
+    int turn = (adc_buffer.l_rx2 - ADC_MID) / 8;
+    int speed = (adc_buffer.l_tx2 - ADC_MID) / 4;
+
+    if (ABS(turn) < 4) {
+      turn = 0;
+    } else {
+      turn -= 4 * SIGN(turn);
+    }
+
+    if (ABS(speed) < 5) {
+      speed = 0;
+    }
+
+    set_throttle(speed + turn, speed - turn);
+      // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
+      // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
+}
+
+void device_init(){
+  set_weaking(2);
+}
+
+
+
+
 void init(){
     HAL_Init();
     __HAL_RCC_AFIO_CLK_ENABLE();
@@ -108,14 +137,14 @@ void init(){
 
     load_eeprom();  // initialize variables from eeprom or initialize them
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
-    set_weaking(2);
-    set_bldc_motors(true);
 }
 
 #ifndef OVERRIDE_MAIN
 int main(void) {
 main_start:  // only for defect boards if you think your hardware is working please remove
   init();
+  device_init();
+  set_bldc_motors(true);
   int tmp_trottle[2] = {0,0};
   while(1) {
     HAL_Delay(3);

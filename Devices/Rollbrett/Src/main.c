@@ -16,3 +16,7 @@ void device_specific(){
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }
+
+void device_init(){
+  set_weaking(2);
+}
