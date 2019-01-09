@@ -172,6 +172,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
         set_buzzer(buttonRelease);
         set_bldc_motors(true);
         // do something
+        device_button();
       }
       else{
         set_buzzer(shutDownSound);
