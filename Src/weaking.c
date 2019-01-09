@@ -5,6 +5,7 @@
 #include "weaking.h"
 #include "bldc.h"
 #include "config.h"
+#include "defines.h"
 
 RetValWeak longRange (int torque, unsigned int period, unsigned int cur_phase, int current){
   return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = false};
