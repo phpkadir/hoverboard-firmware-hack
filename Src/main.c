@@ -66,6 +66,10 @@ void device_init(){
   set_weaking(2);
 }
 
+void device_button(){
+  
+}
+
 //for linking boost ups buildtime
 const uint32_t lowBattery[] = {
   BATTERY_VOLTAGE2ADC12(BAT_LOW_DEAD),
