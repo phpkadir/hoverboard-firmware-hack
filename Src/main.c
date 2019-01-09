@@ -197,7 +197,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
 
     //END FINAL CODE
     if  (battery_voltage < lowBattery[0]) {
-      set_buzzer(lowBattery3);
+      set_buzzer(lowBatTones[0]);
       set_bldc_motors(false);
       HAL_Delay(200);
       turnOff();
@@ -219,11 +219,14 @@ inline void swp(int* x,int* y){
 	*x = *y;
 	*y = tmp;
 }
-int calc_median(int x[],int cnt){
-	for(int y=0;y<cnt-1; y++)
+inline void sort_array(int x[],int cnt){
+  for(int y=0;y<cnt-1; y++)
 		for(int z=y+1;z<cnt; z++)
 			if(x[y]>x[z])
 				swp(&x[y],&x[z]);
+}
+int calc_median(int x[],int cnt){
+  sort_list(x,cnt);
 	if(cnt%2)
 		return x[cnt/2];
 	else
