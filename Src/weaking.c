@@ -11,7 +11,10 @@ RetValWeak longRange (int torque, unsigned int period, unsigned int cur_phase, i
   return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = false};
 }
 RetValWeak STVO6kmh(int torque, unsigned int period, unsigned int cur_phase, int current){
-  return (RetValWeak){ .pwm  = torque/8, .weak = 0,  .timing = false};
+  if(period < PERIOD6KMH)
+    return (RetValWeak){ .pwm  = torque, .weak = 0,  .timing = false};
+  else
+    return (RetValWeak){ .pwm  = torque/8, .weak = 0,  .timing = false};
 }
 
 RetValWeak nullFuncWeak(int torque, unsigned int period, unsigned int cur_phase, int current){

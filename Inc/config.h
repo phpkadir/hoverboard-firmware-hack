@@ -64,6 +64,7 @@
 #define PWM_REVERSE_MAX (-(PWM_MAX * 3 / 10)) 
 #define WEAKING_PWM_MAX 450
 #define THROTTLE_MAX 1000
+#define PERIOD6KMH 100
 // ################################################################################
 
 // validate settings (do not touch this):
