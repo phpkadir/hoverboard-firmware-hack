@@ -43,9 +43,10 @@ extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 
 
 //rollbrett
+int divisor = 2;
 void device_specific(){
     int turn = (adc_buffer.l_rx2 - ADC_MID) / 8;
-    int speed = (adc_buffer.l_tx2 - ADC_MID) / 4;
+    int speed = (adc_buffer.l_tx2 - ADC_MID) / (2 * divisor);
 
     if (ABS(turn) < 4) {
       turn = 0;
@@ -67,7 +68,10 @@ void device_init(){
 }
 
 void device_button(){
-  
+  if(divisor == 1)
+    divisor = 2;
+  else
+    divisor = 1;
 }
 
 //for linking boost ups buildtime
