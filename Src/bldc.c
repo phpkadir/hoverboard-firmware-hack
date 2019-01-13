@@ -206,9 +206,9 @@ volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the ti
 uint8_t next_pos(uint8_t oldpos, int8_t direction){
   switch(direction){
     case -1:
-      return (oldpos - 1) == -1 ? 5 : (oldpos - 1);
+      return (oldpos + 5) % 6;  // -1
     case 1:
-      return (oldpos + 1) == 6 ? 0 : (oldpos + 1);
+      return (oldpos + 1) % 6;  // +1
     default:
       return oldpos;
   }
@@ -251,7 +251,7 @@ void sensored_brushless_countrol(){
       &phase[1],
       &phase[2]);
     blockPWM(tmp.weak,
-      (timing_pos + (tmp.pwm > 0 ? 5 : 1)) % 6,
+      (timing_pos + (internal_phase_period[x] > 0 ? 5 : 1)) % 6,
       &wphase[0],
       &wphase[1],
       &wphase[2]);
