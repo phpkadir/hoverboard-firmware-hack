@@ -28,7 +28,9 @@ void load_eeprom_v1(){
 }
 
 void save_eeprom_v1(){
-
+    HAL_FLASH_Unlock();
+    HAL_FLASH_Lock();
+    
 }
 
 const void (*eeprom_savers[])() = {

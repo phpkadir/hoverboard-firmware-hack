@@ -38,6 +38,8 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c \
+Drivers/STM32F1xx_HAL_Driver/Src/hd44780.c\
+Drivers/STM32F1xx_HAL_Driver/Src/pcf8574.c\
 
 C_SOURCES_GLOBAL = \
 Src/system_stm32f1xx.c \
