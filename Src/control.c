@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include "stm32f1xx_hal.h"
+#include "hd44780.h"
 #include "defines.h"
 #include "setup.h"
 #include "control.h"
@@ -12,6 +13,8 @@
 #include "weaking.h"
 #include "buzzertones.h"
 
+
+LCD_PCF8574_HandleTypeDef lcd;
 TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;

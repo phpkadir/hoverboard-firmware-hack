@@ -4,7 +4,7 @@
  *  Created on: Dec 30, 2014
  *      Author: peter
  */
-
+#include <stdint.h>
 #include "pcf8574.h"
 
 PCF8574_RESULT PCF8574_Init(PCF8574_HandleTypeDef* handle) {

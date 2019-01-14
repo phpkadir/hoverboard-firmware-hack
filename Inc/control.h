@@ -1,7 +1,9 @@
 //ALPHA V0.1
 #pragma once
 #include <stdint.h>
+#include "hd44780.h"
 
+extern LCD_PCF8574_HandleTypeDef lcd;
 extern uint32_t timeout;
 
 void turnOff();

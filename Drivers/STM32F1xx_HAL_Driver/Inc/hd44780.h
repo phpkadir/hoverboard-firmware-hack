@@ -56,7 +56,9 @@ typedef enum{
  */
 typedef enum{
 	NUMBER_OF_LINES_1=0,
-	NUMBER_OF_LINES_2=1
+	NUMBER_OF_LINES_2=1,
+	NUMBER_OF_LINES_3=2,
+	NUMBER_OF_LINES_4=3
 } LCD_NUMBER_OF_LINES;
 
 /**
@@ -68,7 +70,7 @@ typedef struct{
 	uint8_t 				D;
 	uint8_t 				C;
 	uint8_t 				B;
-	char 					lcdbuf[2][16];		/**< Buffer for the LCD */
+	//char 					lcdbuf[4][32];		/**< Buffer for the LCD */
 	int 					x, oldx, y, oldy;
 	uint8_t 				state;				/**< Holds current state of the PCF8574 expander */
 	uint32_t*				pins;				/**< Array of pins based on your hardware (wiring) */

@@ -2,6 +2,8 @@
     "files.associations": {
         "config.h": "c",
         "stm32f1xx_hal_flash.h": "c",
-        "stm32f1xx_hal.h": "c"
+        "stm32f1xx_hal.h": "c",
+        "control.h": "c",
+        "generic_device.h": "c"
     }
 }

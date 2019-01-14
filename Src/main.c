@@ -34,8 +34,6 @@
 
 void SystemClock_Config(void);
 
-LCD_PCF8574_HandleTypeDef lcd;
-
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
