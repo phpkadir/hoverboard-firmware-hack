@@ -49,9 +49,10 @@ Src/main.c \
 Src/bldc.c \
 Src/comms.c \
 Src/stm32f1xx_it.c \
-Src/weaking.c\
-Src/buzzertones.c\
-Src/eeprom_manager.c\
+Src/weaking.c \
+Src/buzzertones.c \
+Src/eeprom_manager.c \
+Src/generic_device.c \
 
 
 # ASM sources

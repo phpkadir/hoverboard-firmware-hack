@@ -39,50 +39,6 @@ extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
 
 
-
-//rollbrett
-int divisor = 2;
-void device_specific(){
-    int turn = (adc_buffer.l_rx2 - ADC_MID) / 8;
-    int speed = (adc_buffer.l_tx2 - ADC_MID) / (2 * divisor);
-
-    if (ABS(turn) < 4) {
-      turn = 0;
-    } else {
-      turn -= 4 * SIGN(turn);
-    }
-
-    if (ABS(speed) < 5) {
-      speed = 0;
-    }
-
-    set_throttle(speed + turn, speed - turn);
-      // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
-      // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
-}
-
-void device_init(){
-  set_weaking(2);
-}
-
-void device_button(){
-  if(divisor == 1)
-    divisor = 2;
-  else
-    divisor = 1;
-}
-
-//for linking boost ups buildtime
-const uint32_t lowBattery[] = {
-  BATTERY_VOLTAGE2ADC12(BAT_LOW_DEAD),
-  BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2),
-  BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL1)
-};
-
-const uint32_t lowBattery_length = 3;
-
-
-
 void init(){
     HAL_Init();
     __HAL_RCC_AFIO_CLK_ENABLE();
@@ -152,7 +108,6 @@ void init(){
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release
 }
 
-#ifndef OVERRIDE_MAIN
 int main(void) {
 main_start:  // only for defect boards if you think your hardware is working please remove
   init();
@@ -215,7 +170,6 @@ main_start:  // only for defect boards if you think your hardware is working ple
   }
   goto main_start;  // if this goto is used the board is defect and everybody knows: "Defect boards are liking defect code" :D
 }
-#endif
 
 inline void swp(int* x,int* y){
 	int tmp = *x;
