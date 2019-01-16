@@ -164,7 +164,7 @@ typedef struct {
   uint16_t dcr;
   uint16_t dcl;
   uint16_t batt1;
-  uint16_t l_tx2;
+  uint16_t l_tx2; //7
   uint16_t bat1;
-  uint16_t l_rx2;
+  uint16_t l_rx2; //9
 } adc_buf_t;

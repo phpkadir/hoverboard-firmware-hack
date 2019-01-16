@@ -43,6 +43,11 @@ void save_eeprom(){
     eeprom_savers[eeprom_savers_lenght-1]();
 }
 
+void reset_eeprom(){
+    // clean eeprom set version 0
+    set_eeprom_version(0);
+}
+
 void load_eeprom(){
     switch(get_eeprom_version()){
         case 1:
@@ -63,11 +68,6 @@ void load_eeprom(){
             break;
     }
     reset_eeprom();
-}
-
-void reset_eeprom(){
-    // clean eeprom set version 0
-    set_eeprom_version(0);
 }
 
 __attribute__ ((section(".persistent_variables")))

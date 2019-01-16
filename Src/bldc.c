@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+#include <stdlib.h>
 #include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"
@@ -235,7 +236,7 @@ void sensored_brushless_countrol(){
       last_pos[x] = real_pos;
     } else if(timer[x] > abs(internal_phase_period[x]))
       set_phase_lr[x](internal_phase_period[x] = SIGN(internal_phase_period[x])*timer[x]);
-    set_tim_lr[x]((currentlr[x] = ABS(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
+    set_tim_lr[x]((currentlr[x] = abs(adc_array[5-x] - adc_offset[5-x]) * MOTOR_AMP_CONV_DC_AMP) <= current_limit);
     RetValWeak tmp = currentWeaking(throttlelr[x],
       internal_phase_period[x],
       timer[x],

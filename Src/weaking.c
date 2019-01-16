@@ -1,6 +1,7 @@
 //ALPHA V0.1
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "stm32f1xx_hal.h"
 #include "weaking.h"
 #include "bldc.h"
@@ -21,10 +22,10 @@ RetValWeak nullFuncWeak(int torque, unsigned int period, unsigned int cur_phase,
   return (RetValWeak){ .pwm  = 0, .weak = 0, .timing = false};
 }
 RetValWeak fastMode(int torque, unsigned int period, unsigned int cur_phase, int current){//todo same algorythmus than optweaking but less agressive and more efficient
-  if(abs(torque) > (THROTTLE_MAX *95 / 100) && abs(period) < 0)
-    return (RetValWeak){ .pwm  = PWM_MAX, .weak = WEAKING_PWM_MAX, .timing = false};
+  if(abs(torque) > (THROTTLE_MAX * 70 / 100) && abs(period) < 0)
+    return (RetValWeak){ .pwm  = PWM_MAX, .weak = (torque - (THROTTLE_MAX * 70 / 100)) * WEAKING_PWM_MAX /(THROTTLE_MAX * 30 / 100), .timing = false};
   else
-    return (RetValWeak){ .pwm  = torque * PWM_MAX / THROTTLE_MAX, .weak = 0, .timing = false};
+    return (RetValWeak){ .pwm  = torque *100* PWM_MAX /70 / THROTTLE_MAX, .weak = 0, .timing = false};
 }
 RetValWeak optWeaking(int torque, unsigned int period, unsigned int cur_phase, int current){//todo
   return (RetValWeak){ .pwm  = PWM_MAX, .weak = 0, .timing = false};

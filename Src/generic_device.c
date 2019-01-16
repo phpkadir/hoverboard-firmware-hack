@@ -1,3 +1,5 @@
+#include <math.h>
+#include <stdlib.h>
 #include "stm32f1xx_hal.h"  // main code for stm32 controller
 #include "defines.h"  // for the macros
 #include "setup.h"  // for access the functions form setup
@@ -10,27 +12,20 @@
 
 //rollbrett
 int divisor = 2;
+bool weak = false;
 int clean_adc(uint32_t inval){
-  int outval = inval >> 16 - ADC_MID;
-  if(ABS(outval) < DEAD_ZONE/2)
-    outval = 0;
+  int outval = (uint32_t)(inval >> 16) - ADC_MID;
+  if(abs(outval) < (DEAD_ZONE / 2))
+    return 0;
   else
-    outval -= DEAD_ZONE/2 * SIGN(outval);
+    outval -= (DEAD_ZONE / 2) * SIGN(outval);
+  if(abs(outval) > (ADC_MAX / 2 - ((DEAD_ZONE * 3) / 2)))
+    return THROTTLE_MAX * SIGN(outval);
+  return outval * THROTTLE_MAX / (ADC_MAX / 2 - ((DEAD_ZONE*3)/2));
 }
 void device_specific(){
-    int turn = (adc_buffer.l_rx2 - ADC_MID) / 8;
-    int speed = (adc_buffer.l_tx2 - ADC_MID) / (2 * divisor);
-
-    if (ABS(turn) < 4) {
-      turn = 0;
-    } else {
-      turn -= 4 * SIGN(turn);
-    }
-
-    if (ABS(speed) < 5) {
-      speed = 0;
-    }
-
+    int turn = clean_adc(virtual_ival[1][1]) / 4;
+    int speed = clean_adc(virtual_ival[1][0]) / divisor;
     set_throttle(speed + turn, speed - turn);
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
@@ -41,10 +36,21 @@ void device_init(){
 }
 
 void device_button(){
-  if(divisor == 1)
+  if(divisor == 1 && weak){
     divisor = 2;
-  else
+    weak = false;
+    set_weaking(2);
+  }
+  else if(divisor == 1 && !weak){
     divisor = 1;
+    weak = true;
+    set_weaking(3);
+  }
+  else{
+    divisor = 1;
+    weak = false;
+    set_weaking(2);
+  }
 }
 
 //for linking boost ups buildtime
