@@ -10,6 +10,13 @@
 
 //rollbrett
 int divisor = 2;
+int clean_adc(uint32_t inval){
+  int outval = inval >> 16 - ADC_MID;
+  if(ABS(outval) < DEAD_ZONE/2)
+    outval = 0;
+  else
+    outval -= DEAD_ZONE/2 * SIGN(outval);
+}
 void device_specific(){
     int turn = (adc_buffer.l_rx2 - ADC_MID) / 8;
     int speed = (adc_buffer.l_tx2 - ADC_MID) / (2 * divisor);

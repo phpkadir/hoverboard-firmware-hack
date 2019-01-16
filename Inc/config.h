@@ -16,7 +16,7 @@
 #define BAT_LOW1_CELL    3.5
 #define BAT_LOW2_CELL    3.3
 #define BAT_LOW_DEAD_CELL 3.1
-#define PWM_REVERSE_MAX (-(PWM_MAX * 3 / 10))
+#define THROTTLE_REVERSE_MAX (-(THROTTLE_MAX * 3 / 10))
 #define BEEPS_BACKWARD
 // ################################################################################
 
@@ -63,9 +63,9 @@
 
 #define  PWM_MIN 0
 #define PWM_MAX (PWM_RES / 2)
-#define WEAKING_PWM_MAX 450
+#define WEAKING_PWM_MAX (PWM_MAX*45/100)
 #define THROTTLE_MAX 1000
-#define PERIOD6KMH 100
+#define PERIOD6KMH (PWM_FREQ / 50)
 // ################################################################################
 
 // validate settings (do not touch this):
