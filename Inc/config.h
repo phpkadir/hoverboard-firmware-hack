@@ -3,8 +3,8 @@
 
 // ################################################################################
 
-#define PWM_FREQ         16000      // PWM frequency in Hz default 16k
-#define DEAD_TIME        32         // PWM deadtime        default 32
+#define PWM_FREQ         32000      // PWM frequency in Hz default 16k
+#define DEAD_TIME        16         // PWM deadtime        default 32
 #define BAT_CALIB_REAL_VOLTAGE        43.0       // input voltage measured by multimeter
 #define BAT_CALIB_ADC                 1704       // adc-value measured by mainboard (value nr 5 on UART debug output)
 

@@ -32,6 +32,8 @@ void device_specific(){
 }
 
 void device_init(){
+  divisor = 2;
+  weak = false;
   set_weaking(2);
 }
 
