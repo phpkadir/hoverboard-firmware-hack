@@ -10,6 +10,13 @@
 uint32_t PCF8574_Type0Pins[8] = { 4, 5, 6, 7, 0, 1, 2, 3 };
 uint8_t LCDerrorFlag = 0;
 
+const LCD_NUMBER_OF_LINES NUM_OF_LINES = {
+	NUMBER_OF_LINES_1,
+	NUMBER_OF_LINES_2,
+	NUMBER_OF_LINES_3,
+	NUMBER_OF_LINES_4
+};
+
 void LCD_WaitForBusyFlag(LCD_PCF8574_HandleTypeDef* handle) {
 	uint8_t flag;
 	LCD_GetBusyFlag(handle, &flag);

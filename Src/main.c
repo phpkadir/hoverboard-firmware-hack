@@ -34,11 +34,6 @@
 
 void SystemClock_Config(void);
 
-#ifdef CONTROL_PPM
-extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
-#endif
-
-
 void init(){
     HAL_Init();
     __HAL_RCC_AFIO_CLK_ENABLE();
@@ -67,10 +62,6 @@ void init(){
     MX_ADC1_Init();
     MX_ADC2_Init();
 
-    #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
-      UART_Init();
-    #endif
-
     HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);  // set latch to on
 
     HAL_ADC_Start(&hadc1);
@@ -78,7 +69,7 @@ void init(){
 
     set_buzzer(startUpSound);
 
-    HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+    HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);  // turn LED on for looking if the µC is working
 
     #ifdef CONTROL_PPM
       PPM_Init();
@@ -86,23 +77,6 @@ void init(){
 
       I2C_Init();
       HAL_Delay(50);
-      lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
-        lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
-        lcd.pcf8574.i2c = hi2c2;
-        lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
-        lcd.type = TYPE0;
-
-        if(LCD_Init(&lcd)!=LCD_OK){
-            // error occured
-            //TODO while(1);
-        }
-
-      LCD_ClearDisplay(&lcd);
-      HAL_Delay(5);
-      LCD_SetLocation(&lcd, 0, 0);
-      LCD_WriteString(&lcd, "Hover V2.0");
-      LCD_SetLocation(&lcd, 0, 1);
-      LCD_WriteString(&lcd, "Initializing...");
 
     load_eeprom();  // initialize variables from eeprom or initialize them
     while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));  // wait for button release

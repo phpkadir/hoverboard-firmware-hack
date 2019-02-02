@@ -61,6 +61,8 @@ typedef enum{
 	NUMBER_OF_LINES_4=3
 } LCD_NUMBER_OF_LINES;
 
+extern const LCD_NUMBER_OF_LINES NUM_OF_LINES;
+
 /**
  * Structure that hold all the required variables in
  * order to simplify the communication process

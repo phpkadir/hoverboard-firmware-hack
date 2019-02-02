@@ -12,7 +12,7 @@ RetValWeak longRange (int torque, unsigned int period, unsigned int cur_phase, i
   return (RetValWeak){ .pwm  = torque * PWM_MAX / THROTTLE_MAX, .weak = 0, .timing = false};
 }
 RetValWeak STVO6kmh(int torque, unsigned int period, unsigned int cur_phase, int current){
-  if(period < PERIOD6KMH)
+  if(period < 100)
     return (RetValWeak){ .pwm  = torque * PWM_MAX / THROTTLE_MAX, .weak = 0,  .timing = false};
   else
     return (RetValWeak){ .pwm  = torque * PWM_MAX / THROTTLE_MAX / 8, .weak = 0,  .timing = false};

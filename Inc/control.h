@@ -6,6 +6,10 @@
 extern LCD_PCF8574_HandleTypeDef lcd;
 extern uint32_t timeout;
 
+#ifdef CONTROL_PPM
+extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
+#endif
+
 void turnOff();
 void turnOffWithReset();
 
