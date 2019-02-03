@@ -27,7 +27,7 @@ uint8_t scan_i2c_next_address(uint8_t start_address){
   return 255;
 }
 
-void init_Display(uint8_t cols, uint8_t lines, uint8_t address){
+void init_Display(uint8_t lines, uint8_t address){
         lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
         lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
         lcd.pcf8574.i2c = hi2c2;
