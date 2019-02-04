@@ -11,7 +11,7 @@
 #include "control.h"
 
 //rollbrett
-int divisor = 2;
+int divisor = 3;
 bool weak = false;
 int clean_adc(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
@@ -32,13 +32,18 @@ void device_specific(){
 }
 
 void device_init(){
-  divisor = 2;
+  divisor = 3;
   weak = false;
   set_weaking(2);
 }
 
 void device_button(){
   if(divisor == 1 && weak){
+    divisor = 3;
+    weak = false;
+    set_weaking(2);
+  }
+  else if(divisor == 3 && !weak){
     divisor = 2;
     weak = false;
     set_weaking(2);
