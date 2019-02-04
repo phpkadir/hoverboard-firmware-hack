@@ -25,7 +25,7 @@ int clean_adc(uint32_t inval){
 }
 void device_specific(){
     int turn = clean_adc(virtual_ival[1][1]) / 4;
-    int speed = clean_adc(virtual_ival[1][0]) / divisor;
+    int speed = clean_adc(virtual_ival[1][0])* 5 / 3 / divisor;
     set_throttle(speed + turn, speed - turn);
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
