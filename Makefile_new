@@ -1,0 +1,264 @@
+
+.PHONY: all format clean flash unlock fallback_unlock fallback_unlock2 fallback_unlock3
+######################################
+# target
+######################################
+# TARGET := hover
+# Devicefoldername+deviceconfig*
+
+TARGETS := $(basename $(wildcard Devices/*/*.h))
+
+
+
+# .PHONY: all format clean flash unlock fallback_unlock fallback_unlock2 fallback_unlock3
+# ######################################
+# # target
+# ######################################
+# TARGET := $(wildcard Devices/*)
+# 
+# DEVICES := $(basename $(wildcard $(foreach T, $(TARGET), $(T)/*.h)))
+# 
+$(info $(TARGETS))
+# $(info $(DEVICES))
+$(info )
+$(info )
+$(info )
+
+
+
+
+
+######################################
+# building variables
+######################################
+# debug build?
+DEBUG = 0
+# optimization
+OPT = -O3
+
+# Build path
+BUILD_DIR = build
+
+######################################
+# source
+######################################
+# C sources
+C_SOURCES_DRIVERS =  \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c \
+Drivers/STM32F1xx_HAL_Driver/Src/hd44780.c \
+Drivers/STM32F1xx_HAL_Driver/Src/pcf8574.c \
+
+C_SOURCES_GLOBAL = \
+Src/system_stm32f1xx.c \
+Src/setup.c \
+Src/control.c \
+Src/main.c \
+Src/bldc.c \
+Src/comms.c \
+Src/stm32f1xx_it.c \
+Src/weaking.c \
+Src/buzzertones.c \
+Src/eeprom_manager.c \
+Src/generic_device.c \
+
+
+# ASM sources
+ASM_SOURCES =  \
+startup_stm32f103xe.s
+
+#######################################
+# binaries
+#######################################
+PREFIX = arm-none-eabi-
+CC = $(PREFIX)gcc
+AS = $(PREFIX)gcc -x assembler-with-cpp
+CP = $(PREFIX)objcopy
+AR = $(PREFIX)ar
+SZ = $(PREFIX)size
+HEX = $(CP) -O ihex
+BIN = $(CP) -O binary -S
+
+#######################################
+# CFLAGS
+#######################################
+# cpu
+CPU = -mcpu=cortex-m3
+
+# fpu
+# NONE for Cortex-M0/M0+/M3
+
+# float-abi
+
+
+# mcu
+MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
+
+# macros for gcc
+# AS defines
+AS_DEFS =
+
+# C defines
+C_DEFS =  \
+-DUSE_HAL_DRIVER \
+-DSTM32F103xE
+
+
+# AS includes
+AS_INCLUDES =
+
+# C includes
+C_INCLUDES =  \
+-IInc \
+-IDrivers/STM32F1xx_HAL_Driver/Inc \
+-IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
+-IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
+-IDrivers/CMSIS/Include\
+#-IDevices/* TODO include devices folder and force include one device_config*.h
+#name buildfile Devicefoldername+deviceconfig*
+
+
+# compile gcc flags
+ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections -std=gnu11
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -g -gdwarf-2
+endif
+
+
+# Generate dependency information
+CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
+
+
+#######################################
+# LDFLAGS
+#######################################
+# link script
+LDSCRIPT = STM32F103RCTx_FLASH.ld
+
+# libraries
+LIBS = -lc -lm -lnosys
+LIBDIR =
+LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+
+# default action: build all
+# all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
+# all: $(foreach TARGET, $(TARGETS), $(BUILD_DIR)/$(TARGET)/main.elf $(BUILD_DIR)/$(TARGET)/main.hex $(BUILD_DIR)/$(TARGET)/main.bin)
+
+all: $(addsuffix /main.elf, $(addprefix $(BUILD_DIR)/,$(TARGETS))) # $(BUILD_DIR)/$(TARGETS).hex $(BUILD_DIR)/$(TARGETS).bin
+
+
+#######################################
+# build the application
+#######################################
+Makefile: ;
+
+# list of objects
+HEADERS = $(wildcard Inc/*.h)
+# OBJECTS = $(addprefix $(BUILD_DIR)/$(TARGETS)/,$(notdir $(C_SOURCES_DRIVERS:.c=.o)))
+OBJECTS = $(notdir $(C_SOURCES_DRIVERS:.c=.o))
+vpath %.c $(sort $(dir $(C_SOURCES_DRIVERS)))
+# $(info $(OBJECTS))
+
+# OBJECTS += $(addprefix $(BUILD_DIR)/$(TARGETS)/,$(notdir $(C_SOURCES_GLOBAL:.c=.o)))
+OBJECTS += $(notdir $(C_SOURCES_GLOBAL:.c=.o))
+vpath %.c $(sort $(dir $(C_SOURCES_GLOBAL)))
+# $(info $(OBJECTS))
+
+# list of ASM program objects
+# OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
+# OBJECTS += $(addprefix $(BUILD_DIR)/$(TARGETS)/,$(notdir $(ASM_SOURCES:.s=.o)))
+OBJECTS += $(notdir $(ASM_SOURCES:.s=.o))
+vpath %.s $(sort $(dir $(ASM_SOURCES)))
+
+OBJECTS := $(foreach OBJECT, $(OBJECTS), $(foreach PATH, $(addprefix $(BUILD_DIR)/,$(TARGETS))/, $(PATH)/$(OBJECT)))
+
+# $(info $(OBJECTS))
+# $(info $(addprefix $(BUILD_DIR)/$(SUBDIR)/,$(OBJECTS)))
+
+$(addsuffix /%.o, $(addprefix $(BUILD_DIR)/,$(TARGETS))): %.c $(HEADERS) Makefile $(addprefix $(BUILD_DIR)/,$(TARGETS))
+# $(BUILD_DIR)/$(TARGETS)/%.o: %.c $(HEADERS) Makefile $(addprefix $(BUILD_DIR)/,$(TARGETS))
+	$(info 'building objects')
+	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(addprefix $(BUILD_DIR)/,$(TARGETS))/$(notdir $(<:.c=.lst)) $< -o $@
+
+$(addsuffix /%.o, $(addprefix $(BUILD_DIR)/,$(TARGETS))): %.s $(HEADERS) Makefile | $(BUILD_DIR)
+# $(BUILD_DIR)/$(TARGETS)/%.o: %.s $(HEADERS) Makefile | $(BUILD_DIR)
+	$(info 'building objects')
+	$(AS) -c $(CFLAGS) $< -o $@
+
+$(addsuffix /main.elf, $(addprefix $(BUILD_DIR)/,$(TARGETS))/): $(OBJECTS) Makefile
+	$(info 'using objetcs')
+	$(CC) $(filter  $(BUILD_DIR)/$(TARGETS)/%.o, $(OBJECTS)) $(LDFLAGS) -o $@
+	$(SZ) $@
+
+# $(BUILD_DIR)/%/main.elf: $(addprefix $(BUILD_DIR)/%/,$(OBJECTS)) Makefile
+# 	$(CC) $(OBJECTS_SUBDIR) $(LDFLAGS) -o $@
+# 	$(SZ) $@
+
+# $(foreach TARGET, $(TARGETS), $(BUILD_DIR)/$(TARGET).elf): $(OBJECTS) Makefile
+# 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+# 	$(SZ) $@
+
+# $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
+# 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+# 	$(SZ) $@
+
+$(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+	$(HEX) $< $@
+
+$(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+	$(BIN) $< $@
+
+$(BUILD_DIR):
+	mkdir -p $@
+
+$(addprefix $(BUILD_DIR)/,$(TARGETS))::
+	$(info 'creating directory')
+	mkdir -p $@
+
+format:
+	find Src/ Inc/ -iname '*.h' -o -iname '*.c' | xargs clang-format -i
+#######################################
+# clean up
+#######################################
+clean:
+	-rm -fR .dep $(BUILD_DIR)
+
+flash:
+	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
+
+unlock:
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
+
+fallback_unlock:
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c "mww 0x40022010 0x220" -c "mww 0x40022010 0x260" -c "sleep 100" -c "mww 0x40022010 0x230" -c "mwh 0x1ffff800 0x5AA5" -c "sleep 1000" -c "mww 0x40022010 0x2220" -c "sleep 100" -c "mdw 0x40022010" -c "mdw 0x4002201c" -c "mdw 0x1ffff800" -c targets -c "halt" -c "stm32f1x unlock 0"
+
+fallback_unlock2:
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c targets -c "halt" -c "stm32f1x unlock 0"
+
+fallback_unlock3:
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c "mww 0x40022010 0x220" -c "mww 0x40022010 0x260" -c "sleep 100" -c "mww 0x40022010 0x230" -c "mwh 0x1ffff800 0x5AA5" -c "sleep 1000" -c "mww 0x40022010 0x2220" -c "sleep 100" -c "mdw 0x40022010" -c "mdw 0x4002201c" -c "mdw 0x1ffff800" -c shutdown
+#######################################
+# dependencies
+#######################################
+-include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
+
+
+
+# *** EOF ***
