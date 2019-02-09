@@ -156,6 +156,8 @@
 
 #define PWM_RES (64000000 / 2 / PWM_FREQ) /* 2000 */
 #define LIMIT_CURRENT(x) if(current_limit > x) current_limit = x;
+#define IN_RANGE(x, low, up) (((x) >= (low)) && ((x) <= (up)))
+
 typedef struct {
   uint16_t rr1;
   uint16_t rr2;

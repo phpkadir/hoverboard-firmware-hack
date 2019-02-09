@@ -19,12 +19,33 @@ LCD_PCF8574_HandleTypeDef lcd;
 TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;
-uint8_t nunchuck_data[6] = {0};
-
-uint8_t i2cBuffer[2];
 
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
+
+uint8_t scan_i2c_next_address(uint8_t start_address){
+  return 255;
+}
+
+void init_Display(uint8_t lines, uint8_t address){
+        lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
+        lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
+        lcd.pcf8574.i2c = hi2c2;
+        lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
+        lcd.type = TYPE0;
+
+        if(LCD_Init(&lcd)!=LCD_OK){
+            // error occured
+            //TODO while(1);
+        }
+
+      LCD_ClearDisplay(&lcd);
+      HAL_Delay(5);
+      LCD_SetLocation(&lcd, 0, 0);
+      LCD_WriteString(&lcd, "Hover V2.0");
+      LCD_SetLocation(&lcd, 0, 1);
+      LCD_WriteString(&lcd, "Initializing...");
+}
 
 void fallback_defect_latch(){
   stop_buzzer();
@@ -76,8 +97,6 @@ uint32_t ppm_timeout = 0;
 
 bool ppm_valid = true;
 
-#define IN_RANGE(x, low, up) (((x) >= (low)) && ((x) <= (up)))
-
 void PPM_ISR_Callback() {
   // Dummy loop with 16 bit count wrap around
   uint16_t rc_delay = TIM2->CNT;
@@ -91,7 +110,7 @@ void PPM_ISR_Callback() {
     ppm_valid = true;
     ppm_count = 0;
   }
-  else if (ppm_count < PPM_NUM_CHANNELS && IN_RANGE(rc_delay, 900, 2100)){
+  else if (ppm_count < PPM_NUM_CHANNELS && IN_RANGE(rc_delay, 850, 2150)){
     timeout = 0;
     ppm_captured_value_buffer[ppm_count++] = CLAMP(rc_delay, 1000, 2000) - 1000;
   } else {
@@ -135,7 +154,7 @@ void PPM_Init() {
   HAL_TIM_Base_Start(&TimHandle);
 }
 #endif
-
+/*
 void Nunchuck_Init() {
     //-- START -- init WiiNunchuck
   i2cBuffer[0] = 0xF0;
@@ -171,3 +190,4 @@ void Nunchuck_Read() {
   //setScopeChannel(2, (int)nunchuck_data[5] & 1);
   //setScopeChannel(3, ((int)nunchuck_data[5] >> 1) & 1);
 }
+*/
