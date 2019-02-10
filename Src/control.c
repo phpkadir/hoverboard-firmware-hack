@@ -20,6 +20,10 @@ TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;
 
+volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
+volatile uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
+volatile uint8_t ppm_timeout = 0;
+
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
 
@@ -90,11 +94,6 @@ void turnOffWithReset(){
   fallback_defect_latch();
 }
 
-#ifdef CONTROL_PPM
-uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
-uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
-uint32_t ppm_timeout = 0;
-
 bool ppm_valid = true;
 
 void PPM_ISR_Callback() {
@@ -122,7 +121,7 @@ void PPM_ISR_Callback() {
 void PPM_SysTick_Callback() {
   ppm_timeout++;
   // Stop after 500 ms without PPM signal
-  if(ppm_timeout > 500) {
+  if(ppm_timeout > 200) {
     int i;
     for(i = 0; i < PPM_NUM_CHANNELS; i++) {
       ppm_captured_value[i] = 500;
@@ -153,7 +152,6 @@ void PPM_Init() {
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
   HAL_TIM_Base_Start(&TimHandle);
 }
-#endif
 /*
 void Nunchuck_Init() {
     //-- START -- init WiiNunchuck
