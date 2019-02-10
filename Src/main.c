@@ -83,6 +83,7 @@ void init(){
 }
 
 int main(void) {
+restart = true;
 main_start:  // only for defect boards if you think your hardware is working please remove
   init();
   device_init();

@@ -26,6 +26,7 @@ volatile uint8_t ppm_timeout = 0;
 
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
+bool restart;
 
 uint8_t scan_i2c_next_address(uint8_t start_address){
   return 255;
@@ -81,6 +82,7 @@ void turnOff(){
   set_bldc_motors(false);
   save_eeprom();
   //i2c send turnoff commmand
+  restart = false;
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   fallback_defect_latch();
 }
@@ -90,6 +92,7 @@ void turnOffWithReset(){
   set_bldc_motors(false);
   //i2c send reset+turnoff command
   reset_eeprom();
+  restart = false;
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   fallback_defect_latch();
 }
