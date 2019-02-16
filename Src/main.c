@@ -127,7 +127,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
         }
       }
     }
-
+    /*
     //END FINAL CODE
     if  (battery_voltage < lowBattery[0]) {
       set_buzzer(lowBatTones[0]);
@@ -142,6 +142,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
         LIMIT_CURRENT(5 + 5*x);  // limiting the motorcurrent to a lower value
         break;
       }
+      */
   }
   goto main_start;  // if this goto is used the board is defect and everybody knows: "Defect boards are liking defect code" :D
 }
