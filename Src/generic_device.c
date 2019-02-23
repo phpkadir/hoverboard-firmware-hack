@@ -11,10 +11,8 @@
 #include "control.h"
 
 //rollbrett
-int divisor = 3;
-bool weak = false;
 int clean_adc(uint32_t inval){
-  int outval = (uint32_t)(inval >> 16) - ADC_MID;
+  int outval = (uint32_t)(inval >> 16);
   if(abs(outval) < (DEAD_ZONE / 2))
     return 0;
   else
@@ -24,21 +22,20 @@ int clean_adc(uint32_t inval){
   return outval * THROTTLE_MAX / (ADC_MAX / 2 - ((DEAD_ZONE*3)/2));
 }
 void device_specific(){
-    int turn = clean_adc(virtual_ival[1][1]) / 4;
-    int speed = clean_adc(virtual_ival[1][0]) /* * 5 / 3 */ / divisor;
-    set_throttle(speed + turn, speed - turn);
+    set_throttle(clean_adc(virtual_ival[1][1]), clean_adc(virtual_ival[1][0]));
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }
 
 void device_init(){
-  divisor = 3;
-  weak = false;
-  set_weaking(2);
+  //divisor = 3;
+  //weak = false;
+  set_weaking(3);
+  //PPM_Init();
 }
 
 void device_button(){
-  if(divisor == 1 && weak){
+  /*if(divisor == 1 && weak){
     divisor = 3;
     weak = false;
     set_weaking(2);
@@ -57,7 +54,7 @@ void device_button(){
     divisor = 1;
     weak = false;
     set_weaking(2);
-  }
+  }*/
 }
 
 //for linking boost ups buildtime
