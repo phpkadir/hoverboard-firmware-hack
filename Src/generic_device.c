@@ -12,7 +12,7 @@
 
 //rollbrett
 int clean_adc(uint32_t inval){
-  int outval = (uint32_t)(inval >> 16);
+  int outval = (uint32_t)(inval >> 16) - ADC_MID;
   if(abs(outval) < (DEAD_ZONE / 2))
     return 0;
   else
@@ -22,7 +22,8 @@ int clean_adc(uint32_t inval){
   return outval * THROTTLE_MAX / (ADC_MAX / 2 - ((DEAD_ZONE*3)/2));
 }
 void device_specific(){
-    set_throttle(clean_adc(virtual_ival[1][1]), clean_adc(virtual_ival[1][0]));
+  int tmp = (clean_adc(virtual_ival[1][1]) + THROTTLE_MAX) /2 *SIGN(clean_adc(virtual_ival[1][0]));
+    set_throttle(tmp, tmp);
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }

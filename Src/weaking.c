@@ -34,9 +34,9 @@ RetValWeak optWeaking(int torque, unsigned int period, unsigned int cur_phase, i
 const WeakStruct weakfunctions[] = {
   {nullFuncWeak," Off", 0},
   {STVO6kmh,"STVO", 5},
-  {longRange,"LoRa", 15},
-  {fastMode,"Fast",20},
-  {optWeaking,"Race",60}
+  {longRange,"LoRa", 25},
+  {fastMode,"Fast",100},
+  {optWeaking,"Race",200}
 };
 void set_weaking(int x){
   currentWeaking = weakfunctions[x].func;
