@@ -33,10 +33,24 @@ uint8_t scan_i2c_next_address(uint8_t start_address){
 }
 
 void init_Display(uint8_t lines, uint8_t address){
-        lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
+  
+        lcd.pcf8574.PCF_I2C_ADDRESS = address;
         lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
         lcd.pcf8574.i2c = hi2c2;
-        lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
+        switch (lines){
+          case 1:
+          lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_1;
+          break;
+          case 2:
+          lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
+          break;
+          case 3:
+          lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_3;
+          break;
+          case 4:
+          lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_4;
+          break;
+        }
         lcd.type = TYPE0;
 
         if(LCD_Init(&lcd)!=LCD_OK){
@@ -47,8 +61,8 @@ void init_Display(uint8_t lines, uint8_t address){
       LCD_ClearDisplay(&lcd);
       HAL_Delay(5);
       LCD_SetLocation(&lcd, 0, 0);
-      LCD_WriteString(&lcd, "Hover V2.0");
-      LCD_SetLocation(&lcd, 0, 1);
+      LCD_WriteString(&lcd, "LDEFWH V2.1");
+      LCD_SetLocation(&lcd, 0, lines / 2);
       LCD_WriteString(&lcd, "Initializing...");
 }
 

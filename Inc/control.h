@@ -12,6 +12,8 @@ extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 void turnOff();
 void turnOffWithReset();
 
+void init_Display(uint8_t lines, uint8_t address);
+
 int clean_adc(uint32_t inval);
 int calc_torque(int throttle,int breaks);
 void calc_torque_per_wheel(int throttle, float steering_eagle, int* torque);

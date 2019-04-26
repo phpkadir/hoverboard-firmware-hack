@@ -1,3 +1,5 @@
 build/*
 !build/hover.hex
 *.sw*
+.vscode*
+*.ipch

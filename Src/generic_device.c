@@ -29,6 +29,7 @@ void device_specific(){
 }
 
 void device_init(){
+  init_Display(4,0x27);
   //divisor = 3;
   //weak = false;
   set_weaking(3);
