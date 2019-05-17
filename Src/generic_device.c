@@ -21,8 +21,16 @@ int clean_adc(uint32_t inval){
     return THROTTLE_MAX * SIGN(outval);
   return outval * THROTTLE_MAX / (ADC_MAX / 2 - ((DEAD_ZONE*3)/2));
 }
+
+int clean_bobbycar(uint32_t inval){
+  int outval = (uint32_t)(inval >> 16);
+  if(abs(outval) > (ADC_MAX - ((DEAD_ZONE * 3) / 2)))
+    return THROTTLE_MAX;
+  return outval * THROTTLE_MAX / (ADC_MAX - ((DEAD_ZONE*3)/2));
+}
+
 void device_specific(){
-  int tmp = (clean_adc(virtual_ival[1][1]) + THROTTLE_MAX) /2 *SIGN(clean_adc(virtual_ival[1][0]));
+  int tmp = clean_bobbycar(virtual_ival[1][1]) - clean_bobbycar(virtual_ival[1][0]);
     set_throttle(tmp, tmp);
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
