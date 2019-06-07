@@ -18,6 +18,8 @@
 #define BAT_LOW_DEAD_CELL 2.9
 #define THROTTLE_REVERSE_MAX (-(THROTTLE_MAX * 3 / 10))
 #define BEEPS_BACKWARD
+
+#define I2C_MASTER
 // ################################################################################
 
 //#define DEBUG_SERIAL_USART3         // left sensor board cable, disable if ADC or PPM is used!
