@@ -38,7 +38,7 @@ void device_specific(){
 
 void device_init(){
   HAL_Delay(50);
-  init_Display(4,0x27);
+  init_Display(4,0x3F);
   //divisor = 3;
   //weak = false;
   set_weaking(3);
