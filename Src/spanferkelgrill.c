@@ -30,9 +30,8 @@ int clean_bobbycar(uint32_t inval){
 }
 
 void device_specific(){
-	int tmp = clean_bobbycar(virtual_ival[1][1]);
-    set_throttle(tmp, 0);
-	set_throttle(0, tmp);
+  int tmp = clean_bobbycar(virtual_ival[1][1]) - clean_bobbycar(virtual_ival[1][0]);
+    set_throttle(tmp, tmp);
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }

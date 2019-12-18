@@ -30,8 +30,8 @@
 #include "config.h"  // the config
 #include "comms.h"
 #include "control.h"
-#include "generic_device.h"
-
+//#include "generic_device.h"
+#include "spanferkelgrill.h"
 void SystemClock_Config(void);
 
 void init(){

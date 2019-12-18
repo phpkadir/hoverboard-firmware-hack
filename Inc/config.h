@@ -10,13 +10,15 @@
 
 //device specific
 #define DEAD_ZONE 64
-#define BAT_CELL_CNT     10.0
+//#define BAT_CELL_CNT     12.0
+#define BAT_CELL_CNT     2.0
 #define BAT_FULL_CELL    4.2
 #define BAT_RATED_CELL   3.7
 #define BAT_LOW1_CELL    3.4
 #define BAT_LOW2_CELL    3.2
 #define BAT_LOW_DEAD_CELL 2.9
-#define THROTTLE_REVERSE_MAX (-(THROTTLE_MAX * 3 / 10))
+//#define THROTTLE_REVERSE_MAX (-(THROTTLE_MAX * 3 / 10))
+#define THROTTLE_REVERSE_MAX (-THROTTLE_MAX)
 #define BEEPS_BACKWARD
 
 #define I2C_MASTER
