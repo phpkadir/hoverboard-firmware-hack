@@ -10,6 +10,9 @@
 #include "comms.h"
 #include "control.h"
 
+int ideal_phase_period = 0x8FFFFFFF;
+int speed = 100;
+uint8_t last_last_pos;
 //rollbrett
 int clean_adc(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
@@ -29,19 +32,42 @@ int clean_bobbycar(uint32_t inval){
   return outval * THROTTLE_MAX / (ADC_MAX - ((DEAD_ZONE*3)/2));
 }
 
+//last_pos[0];
+//timer[0];
+//last_pos[0];
+//phase_period[0];
+
 void device_specific(){
-  int tmp = clean_bobbycar(virtual_ival[1][1]) - clean_bobbycar(virtual_ival[1][0]);
-    set_throttle(tmp, tmp);
+  int current_phase;
+  if(abs(phase_period[0]) < timer[0]){
+    current_phase = SIGN(phase_period[0]) * timer[0];
+  }
+  else{
+    current_phase = phase_period[0];
+  }
+  if(ideal_phase_period>phase_period){
+    //increase speed
+    speed*=2;
+  }
+  else{
+    //degrease speed
+    speed/=2;
+
+  }
+  int tmp = clean_adc(virtual_ival[1][1]);
+    set_throttle(speed, 0);
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }
 
 void device_init(){
+  last_last_pos = last_pos[0];
+  ideal_phase_period = 5556;
   HAL_Delay(50);
   init_Display(4,0x3F);
   //divisor = 3;
   //weak = false;
-  set_weaking(3);
+  set_weaking(2);
   //PPM_Init();
 }
 
