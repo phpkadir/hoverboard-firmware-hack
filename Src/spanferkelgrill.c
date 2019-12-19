@@ -12,7 +12,7 @@
 
 int ideal_phase_period = 0x8FFFFFFF;
 int speed = 100;
-uint8_t last_last_pos;
+uint8_t last_last_pos = 0;
 //rollbrett
 int clean_adc(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
@@ -39,23 +39,33 @@ int clean_bobbycar(uint32_t inval){
 
 void device_specific(){
   int current_phase;
-  if(abs(phase_period[0]) < timer[0]){
-    current_phase = SIGN(phase_period[0]) * timer[0];
+  int tmp1 = clean_adc(virtual_ival[1][1]) * 10;
+  //ideal_phase_period = tmp1;
+  int tmp2 = clean_adc(virtual_ival[1][0]);
+  if(last_last_pos != last_pos[0]){
+    if(abs(phase_period[0]) < timer[0]){
+      current_phase = SIGN(phase_period[0]) * timer[0];
+    }
+    else{
+      current_phase = phase_period[0];
+    }
+    if(ideal_phase_period>current_phase){
+      //increase speed
+      int temp_diff = ideal_phase_period - current_phase;
+      speed += speed * temp_diff / ideal_phase_period;
+    }
+    else{
+      //degrease speed
+      int temp_diff = ideal_phase_period - current_phase;
+      speed -= speed * temp_diff / ideal_phase_period;
+    }
   }
-  else{
-    current_phase = phase_period[0];
-  }
-  if(ideal_phase_period>phase_period){
-    //increase speed
-    speed*=2;
-  }
-  else{
-    //degrease speed
-    speed/=2;
 
-  }
-  int tmp = clean_adc(virtual_ival[1][1]);
-    set_throttle(speed, 0);
+  if(abs(speed) < tmp2/2)
+    speed = tmp2/2 * SIGN(speed);
+
+  set_throttle(speed, 0);
+
       // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }
