@@ -17,7 +17,7 @@ volatile int32_t _buff_ival[2];
 const int32_t *virtual_currentlr[] = {currentlr,_buff_curlr};
 const int32_t *virutal_phase[] = {phase_period,_buff_phase};
 #ifdef I2C_MASTER
-const int32_t *virtual_ival[] = {(int*)&(((uint16_t*)&adc_buffer)[6]),_buff_ival};
+const int32_t *virtual_ival[] = {(int*)&(((uint16_t*)&adc_buffer)[6]),_buff_ival};  // magic code
 #else
 const int32_t *virtual_ival[] = {_buff_ival,(int32_t*)&(((uint16_t*)&adc_buffer)[6])};
 #endif
