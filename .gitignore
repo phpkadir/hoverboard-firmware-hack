@@ -1,4 +1,5 @@
 build/*
+.vscode/*
 !build/hover.hex
 *.sw*
 .vscode*
