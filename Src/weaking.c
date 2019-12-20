@@ -10,6 +10,12 @@
 
 int last_speed = 0;
 
+bool timing(uint16_t eagle/*0 to UINT16_MAX*/, int period, unsigned int cur_phase){
+  if(eagle == 0)
+    return false;  
+  return cur_phase < (period * (UINT16_MAX - eagle) / UINT16_MAX);
+}
+
 RetValWeak longRange (int torque, int period, unsigned int cur_phase, int current){
   return (RetValWeak){ .pwm  = torque * PWM_MAX / THROTTLE_MAX, .weak = 0, .timing = false};
 }
@@ -30,7 +36,7 @@ RetValWeak fastMode(int torque, int period, unsigned int cur_phase, int current)
     return (RetValWeak){ .pwm  = torque *100* PWM_MAX /70 / THROTTLE_MAX, .weak = 0, .timing = false};
 }
 RetValWeak optWeaking(int torque, int period, unsigned int cur_phase, int current){//todo
-  return (RetValWeak){ .pwm  = PWM_MAX, .weak = 0, .timing = false};
+  return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = timing((UINT16_MAX / 32) * torque / THROTTLE_MAX, period, cur_phase)};
 }
 
 int torgue2RPM(int torque){
@@ -44,9 +50,10 @@ RetValWeak fixedRPM(int torque, int period, unsigned int cur_phase, int current)
     else
       return (RetValWeak){ .pwm  = 0, .weak = 0, .timing = false};
     int current_phase;
-    if(abs(period) < cur_phase){
-      current_phase = SIGN(phase_period[0]) * timer[0];
-    }
+    if(abs(period) < cur_phase)
+      current_phase = SIGN(period) * cur_phase;
+    else
+      current_phase = period;
     if(ideal_phase_period>current_phase){
       //increase speed
       int temp_diff = ideal_phase_period - current_phase;
