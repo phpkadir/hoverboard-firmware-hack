@@ -10,10 +10,10 @@
 
 int last_speed = 0;
 
-bool timing(uint16_t eagle/*0 to UINT16_MAX*/, int period, unsigned int cur_phase){
+bool timing(uint8_t eagle/*0 to 255*/, int period, unsigned int cur_phase){
   if(eagle == 0)
     return false;  
-  return cur_phase < (period * (UINT16_MAX - eagle) / UINT16_MAX);
+  return cur_phase < (period * (UINT8_MAX - eagle) / UINT16_MAX);
 }
 
 RetValWeak longRange (int torque, int period, unsigned int cur_phase, int current){
@@ -31,12 +31,16 @@ RetValWeak nullFuncWeak(int torque, int period, unsigned int cur_phase, int curr
 }
 RetValWeak fastMode(int torque, int period, unsigned int cur_phase, int current){//todo same algorythmus than optweaking but less agressive and more efficient
   if(abs(torque) > (THROTTLE_MAX * 70 / 100) && abs(period) < 0)
-    return (RetValWeak){ .pwm  = PWM_MAX, .weak = (torque - (THROTTLE_MAX * 70 / 100)) * WEAKING_PWM_MAX /(THROTTLE_MAX * 30 / 100), .timing = false};
+    return (RetValWeak){
+      .pwm  = PWM_MAX,
+      .weak = (torque - (THROTTLE_MAX * 70 / 100)) * WEAKING_PWM_MAX /(THROTTLE_MAX * 30 / 100),
+      .timing = timing(32 * torque / THROTTLE_MAX, period, cur_phase)
+    };
   else
-    return (RetValWeak){ .pwm  = torque *100* PWM_MAX /70 / THROTTLE_MAX, .weak = 0, .timing = false};
+    return (RetValWeak){ .pwm  = torque * 100 * PWM_MAX / 70 / THROTTLE_MAX, .weak = 0, .timing = false};
 }
 RetValWeak optWeaking(int torque, int period, unsigned int cur_phase, int current){//todo
-  return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = timing((UINT16_MAX / 32) * torque / THROTTLE_MAX, period, cur_phase)};
+  return (RetValWeak){ .pwm  = torque, .weak = 0, .timing = timing(32 * torque / THROTTLE_MAX, period, cur_phase)};
 }
 
 int torgue2RPM(int torque){
