@@ -10,7 +10,7 @@
 #include "comms.h"
 #include "control.h"
 
-//rollbrett
+//bobbycar
 int clean_adc(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
   if(abs(outval) < (DEAD_ZONE / 2))
@@ -30,16 +30,16 @@ int clean_bobbycar(uint32_t inval){
 }
 
 void device_specific(){
-	int tmp = clean_bobbycar(virtual_ival[1][1]);
-    set_throttle(tmp, 0);
-	set_throttle(0, tmp);
-      // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
+	int tmp = clean_adc(virtual_ival[1][1]);
+  int tmp2 = clean_bobbycar(virtual_ival[1][0]);
+    set_throttle(tmp*tmp2/THROTTLE_MAX, tmp*tmp2/THROTTLE_MAX);
+	    // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
       // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
 }
 
 void device_init(){
   HAL_Delay(50);
-  init_Display(4,0x3F);
+  //init_Display(4,0x3F);
   //divisor = 3;
   //weak = false;
   set_weaking(3);
