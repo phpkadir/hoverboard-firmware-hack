@@ -30,8 +30,7 @@
 #include "config.h"  // the config
 #include "comms.h"
 #include "control.h"
-//#include "generic_device.h"
-#include "spanferkelgrill.h"
+#include "generic_device.h"
 void SystemClock_Config(void);
 
 void init(){
@@ -75,7 +74,7 @@ void init(){
       PPM_Init();
     #endif
 
-      I2C_Init();
+      //I2C_Init();
       HAL_Delay(50);
 
     load_eeprom();  // initialize variables from eeprom or initialize them
