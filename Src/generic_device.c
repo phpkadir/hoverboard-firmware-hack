@@ -33,10 +33,15 @@ void device_specific(){
 	int tmp = clean_adc(virtual_ival[0][0]);
   int tmp2 = clean_bobbycar(virtual_ival[0][1]);
   int tmp3 = ((tmp*tmp2/THROTTLE_MAX)*(tmp*tmp2/THROTTLE_MAX) * SIGN(tmp*tmp2) / THROTTLE_MAX + (tmp*tmp2/THROTTLE_MAX)) / 2;
-  if(tmp3 < 0) tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX;
-    set_throttle(tmp3, tmp3);
-	    // (adc_buffer.l_tx2-ADC_MID) / 2 + (adc_buffer.l_rx2-ADC_MID) / 2,
-      // (adc_buffer.l_tx2-ADC_MID) / 2 - (adc_buffer.l_rx2-ADC_MID) / 2);
+  if(tmp3 < 0) {
+    tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX;
+    set_buzzer(reverseSound);
+  }
+
+  else if(tmp3 >= 0)
+    stop_buzzer();
+
+  set_throttle(tmp3, tmp3);
 }
 
 void device_init(){
