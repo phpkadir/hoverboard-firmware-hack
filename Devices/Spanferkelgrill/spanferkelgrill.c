@@ -14,7 +14,7 @@ int ideal_phase_period = 0x8FFFFFFF;
 int speed = 100;
 uint8_t last_last_pos = 0;
 //rollbrett
-int clean_adc(uint32_t inval){
+int clean_adc_full(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
   if(abs(outval) < (DEAD_ZONE / 2))
     return 0;
@@ -25,7 +25,7 @@ int clean_adc(uint32_t inval){
   return outval * THROTTLE_MAX / (ADC_MAX / 2 - ((DEAD_ZONE*3)/2));
 }
 
-int clean_bobbycar(uint32_t inval){
+int clean_adc_half(uint32_t inval){
   int outval = (uint32_t)(inval >> 16);
   if(abs(outval) > (ADC_MAX - ((DEAD_ZONE * 3) / 2)))
     return THROTTLE_MAX;
@@ -39,9 +39,9 @@ int clean_bobbycar(uint32_t inval){
 
 void device_specific(){
   int current_phase;
-  int tmp1 = clean_adc(virtual_ival[1][1]) * 10;
+  int tmp1 = clean_adc_full(virtual_ival[1][1]) * 10;
   //ideal_phase_period = tmp1;
-  int tmp2 = clean_adc(virtual_ival[1][0]);
+  int tmp2 = clean_adc_full(virtual_ival[1][0]);
   if(last_last_pos != last_pos[0]){
     if(abs(phase_period[0]) < timer[0]){
       current_phase = SIGN(phase_period[0]) * timer[0];

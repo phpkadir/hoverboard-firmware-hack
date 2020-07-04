@@ -11,7 +11,7 @@
 #include "control.h"
 
 //bobbycar
-int clean_adc(uint32_t inval){
+int clean_adc_full(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
   if(abs(outval) < (DEAD_ZONE / 2))
     return 0;
@@ -22,7 +22,7 @@ int clean_adc(uint32_t inval){
   return outval * THROTTLE_MAX / (ADC_MAX / 2 - ((DEAD_ZONE*3)/2));
 }
 
-int clean_bobbycar(uint32_t inval){
+int clean_adc_half(uint32_t inval){
   int outval = (uint32_t)(inval >> 16);
   if(abs(outval) > (ADC_MAX - ((DEAD_ZONE * 3) / 2)))
     return THROTTLE_MAX;
@@ -30,15 +30,15 @@ int clean_bobbycar(uint32_t inval){
 }
 
 void device_specific(){
-	int tmp = clean_adc(virtual_ival[0][0]);
-  int tmp2 = clean_bobbycar(virtual_ival[0][1]);
+	int tmp = -clean_adc_full(virtual_ival[0][0]);
+  int tmp2 = clean_adc_half(virtual_ival[0][1]);
   int tmp3 = ((tmp*tmp2/THROTTLE_MAX)*(tmp*tmp2/THROTTLE_MAX) * SIGN(tmp*tmp2) / THROTTLE_MAX + (tmp*tmp2/THROTTLE_MAX)) / 2;
-  if(tmp3 > 0) {
+  if(tmp3 < 0) {
     tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX;
     set_buzzer(reverseSound);
   }
 
-  else if(tmp3 <= 0)
+  else if(tmp3 >= 0)
     stop_buzzer();
 
   set_throttle(tmp3, tmp3);
