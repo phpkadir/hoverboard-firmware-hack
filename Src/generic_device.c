@@ -10,6 +10,20 @@
 #include "comms.h"
 #include "control.h"
 
+#define BUFFERSIZE (UINT8_MAX+1)
+#define VAL_CNT 2
+
+uint8_t index[VAL_CNT] = {0,0};
+int32_t buff_vals[VAL_CNT][BUFFERSIZE];
+int32_t cur_buff_val_sum[VAL_CNT] = {0,0};
+
+int value_buffer(int32_t in,int val){
+  cur_buff_val_sum[val] -= buff_vals[val][index[val]];
+  cur_buff_val_sum[val] += (buff_vals[val][index[val]++] = in >> 16);
+  return (cur_buff_val_sum[val] / (BUFFERSIZE)) << 16;
+}
+
+
 //bobbycar
 int clean_adc_full(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
@@ -30,8 +44,8 @@ int clean_adc_half(uint32_t inval){
 }
 
 void device_specific(){
-	int tmp = -clean_adc_full(virtual_ival[0][0]);
-  int tmp2 = clean_adc_half(virtual_ival[0][1]);
+	int tmp = -clean_adc_full(value_buffer(virtual_ival[0][0],0));
+  int tmp2 = clean_adc_half(value_buffer(virtual_ival[0][1],1));
   int tmp3 = ((tmp*tmp2/THROTTLE_MAX)*(tmp*tmp2/THROTTLE_MAX) * SIGN(tmp*tmp2) / THROTTLE_MAX + (tmp*tmp2/THROTTLE_MAX)) / 2;
   if(tmp3 < 0) {
     tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX;
@@ -51,6 +65,9 @@ void device_init(){
   //weak = false;
   set_weaking(3);
   //PPM_Init();
+  for(int i = 0; i < VAL_CNT ; i++)
+    for(int j = 0; j < BUFFERSIZE;j++)
+      buff_vals[i][j] = 0;
 }
 
 void device_button(){
