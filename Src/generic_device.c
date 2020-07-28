@@ -14,10 +14,10 @@
 #define VAL_CNT 2
 
 uint32_t index[VAL_CNT] = {0,0};
-int32_t buff_vals[VAL_CNT][BUFFERSIZE];
-int32_t cur_buff_val_sum[VAL_CNT] = {0,0};
+uint32_t buff_vals[VAL_CNT][BUFFERSIZE];
+uint32_t cur_buff_val_sum[VAL_CNT] = {0,0};
 
-int32_t value_buffer(int32_t in,int val){
+uint32_t value_buffer(uint32_t in,int val){
   cur_buff_val_sum[val] -= buff_vals[val][index[val]];
   cur_buff_val_sum[val] += (buff_vals[val][index[val]] = (in >> 16));
   index[val] = (index[val] + 1) % BUFFERSIZE;

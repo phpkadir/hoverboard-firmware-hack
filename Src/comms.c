@@ -13,15 +13,15 @@
 
 volatile int32_t _buff_curlr[2];
 volatile int32_t _buff_phase[2];
-volatile int32_t _buff_ival[2];
+volatile uint32_t _buff_ival[2];
 const int32_t *virtual_currentlr[] = {currentlr,_buff_curlr};
 const int32_t *virutal_phase[] = {phase_period,_buff_phase};
 #ifdef I2C_MASTER
-const int32_t *virtual_ival[] = {(int*)&(((uint16_t*)&adc_buffer)[6]),_buff_ival};  // magic code
+const uint32_t *virtual_ival[] = {(int*)&(((uint16_t*)&adc_buffer)[6]),_buff_ival};  // magic code
 #else
-const int32_t *virtual_ival[] = {_buff_ival,(int32_t*)&(((uint16_t*)&adc_buffer)[6])};
+const uint32_t *virtual_ival[] = {_buff_ival,(int32_t*)&(((uint16_t*)&adc_buffer)[6])};
 #endif
-const int32_t **sync_vals[] = {virtual_ival,virtual_currentlr,virutal_phase};
+const uint32_t **sync_vals[] = {virtual_ival,virtual_currentlr,virutal_phase};
 
 #ifdef DEBUG_SERIAL_USART3
 #define UART_DMA_CHANNEL DMA1_Channel2
