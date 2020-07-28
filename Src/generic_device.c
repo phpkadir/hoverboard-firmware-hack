@@ -47,7 +47,7 @@ int clean_adc_half(uint32_t inval){
 void device_specific(){
   int tmp = -clean_adc_full(value_buffer(virtual_ival[0][0],0));
   int tmp2 = clean_adc_half(value_buffer(virtual_ival[0][1],1));
-  int tmp3 = (tmp2*tmp2 / THROTTLE_MAX * tmp * SIGN(tmp2) / THROTTLE_MAX + (tmp*tmp2/THROTTLE_MAX)) / 2;
+  int tmp3 = ((tmp2 * tmp2 * SIGN(tmp2) / THROTTLE_MAX ) * tmp / THROTTLE_MAX + (tmp * tmp2 / THROTTLE_MAX)) / 2;
   if(tmp3 < 0) {
     tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX * (-1);
     if(tmp3 < THROTTLE_REVERSE_MAX / 10)
