@@ -68,9 +68,11 @@ void device_init(){
   //weak = false;
   set_weaking(3);
   //PPM_Init();
-  for(int i = 0; i < VAL_CNT ; cur_buff_val_sum[i++] = 0)
+  for(int i = 0; i < VAL_CNT ; i++){
+    cur_buff_val_sum[i] = index[i] = 0;
     for(int j = 0; j < BUFFERSIZE;j++)
-      cur_buff_val_sum[i] += (buff_vals[i][index[i] = j] = ADC_MID);
+      cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
+  }
 }
 
 void device_button(){
