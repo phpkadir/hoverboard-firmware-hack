@@ -49,7 +49,7 @@ void device_specific(){
   int tmp2 = clean_adc_half(value_buffer(virtual_ival[0][1],1));
   int tmp3 = ((tmp * tmp * SIGN(tmp) / THROTTLE_MAX ) * 2 + tmp ) * tmp2 / THROTTLE_MAX / 3;
   if(tmp3 < 0) {
-    tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX * (-1);
+    tmp3 = tmp3 * THROTTLE_REVERSE_MAX * (-1) / THROTTLE_MAX;
     if(tmp3 < THROTTLE_REVERSE_MAX / 10)
       set_buzzer(reverseSound);
   }
