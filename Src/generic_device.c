@@ -13,9 +13,9 @@
 #define BUFFERSIZE 128
 #define VAL_CNT 2
 
-uint32_t index[VAL_CNT] = {0,0};
+uint32_t index[VAL_CNT];
 uint32_t buff_vals[VAL_CNT][BUFFERSIZE];
-uint32_t cur_buff_val_sum[VAL_CNT] = {0,0};
+uint32_t cur_buff_val_sum[VAL_CNT];
 
 uint32_t value_buffer(uint32_t in,int val){
   cur_buff_val_sum[val] -= buff_vals[val][index[val]];
@@ -67,9 +67,9 @@ void device_init(){
   //weak = false;
   set_weaking(3);
   //PPM_Init();
-  for(int i = 0; i < VAL_CNT ; i++)
+  for(int i = 0; i < VAL_CNT ; cur_buff_val_sum[i++] = 0)
     for(int j = 0; j < BUFFERSIZE;j++)
-      cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
+      cur_buff_val_sum[i] += (buff_vals[i][index[i] = j] = ADC_MID);
 }
 
 void device_button(){
