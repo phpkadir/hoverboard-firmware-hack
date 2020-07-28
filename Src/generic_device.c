@@ -45,15 +45,16 @@ int clean_adc_half(uint32_t inval){
 }
 
 void device_specific(){
-	int tmp = -clean_adc_full(value_buffer(virtual_ival[0][0],0));
+  int tmp = -clean_adc_full(value_buffer(virtual_ival[0][0],0));
   int tmp2 = clean_adc_half(value_buffer(virtual_ival[0][1],1));
   int tmp3 = ((tmp*tmp2/THROTTLE_MAX)*(tmp*tmp2/THROTTLE_MAX) * SIGN(tmp*tmp2) / THROTTLE_MAX + (tmp*tmp2/THROTTLE_MAX)) / 2;
   if(tmp3 < 0) {
-    tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX;
-    set_buzzer(reverseSound);
+    tmp3 = tmp3 * THROTTLE_REVERSE_MAX / THROTTLE_MAX * (-1);
+    if(tmp3 < THROTTLE_REVERSE_MAX / 10)
+      set_buzzer(reverseSound);
   }
 
-  else if(tmp3 >= 0)
+  if(tmp3 >= THROTTLE_REVERSE_MAX / 10)
     stop_buzzer();
 
   set_throttle(tmp3, tmp3);
@@ -68,7 +69,7 @@ void device_init(){
   //PPM_Init();
   for(int i = 0; i < VAL_CNT ; i++)
     for(int j = 0; j < BUFFERSIZE;j++)
-      buff_vals[i][j] = 0;
+      cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
 }
 
 void device_button(){
