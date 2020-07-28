@@ -10,16 +10,17 @@
 #include "comms.h"
 #include "control.h"
 
-#define BUFFERSIZE (UINT8_MAX+1)
+#define BUFFERSIZE 512
 #define VAL_CNT 2
 
-uint8_t index[VAL_CNT] = {0,0};
+uint32_t index[VAL_CNT] = {0,0};
 int32_t buff_vals[VAL_CNT][BUFFERSIZE];
 int32_t cur_buff_val_sum[VAL_CNT] = {0,0};
 
 int value_buffer(int32_t in,int val){
   cur_buff_val_sum[val] -= buff_vals[val][index[val]];
-  cur_buff_val_sum[val] += (buff_vals[val][index[val]++] = in >> 16);
+  cur_buff_val_sum[val] += (buff_vals[val][index[val]] = in >> 16);
+  index[val] = (index[val] + 1) / BUFFERSIZE;
   return (cur_buff_val_sum[val] / (BUFFERSIZE)) << 16;
 }
 
