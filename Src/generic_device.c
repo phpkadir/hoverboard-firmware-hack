@@ -19,7 +19,7 @@ int32_t cur_buff_val_sum[VAL_CNT] = {0,0};
 
 int32_t value_buffer(int32_t in,int val){
   cur_buff_val_sum[val] -= buff_vals[val][index[val]];
-  cur_buff_val_sum[val] += (buff_vals[val][index[val]] = in >> 16);
+  cur_buff_val_sum[val] += (buff_vals[val][index[val]] = (in >> 16));
   index[val] = (index[val] + 1) % BUFFERSIZE;
   return (cur_buff_val_sum[val] / (BUFFERSIZE)) << 16;
 }
