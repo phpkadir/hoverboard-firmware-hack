@@ -61,9 +61,7 @@ void device_specific(){
 
 void device_init(){
   HAL_Delay(50);
-  //init_Display(4,0x3F);
-  //divisor = 3;
-  //weak = false;
+  init_Display(4,0x3F);
   set_weaking(3);
   //PPM_Init();
   for(int i = 0; i < VAL_CNT ; i++){

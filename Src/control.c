@@ -16,6 +16,7 @@
 
 
 LCD_PCF8574_HandleTypeDef lcd;
+bool lcd_init_ok = false;
 TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;
@@ -53,13 +54,16 @@ void init_Display(uint8_t lines, uint8_t address){
         }
         lcd.type = TYPE0;
 
-        if(LCD_Init(&lcd)!=LCD_OK){
+        if(LCD_Init(&lcd)!=LCD_OK)
             // error occured
             //TODO while(1);
-        }
+            set_buzzer(noLCD);
+        else
+            lcd_init_ok = true;
 
       LCD_ClearDisplay(&lcd);
       HAL_Delay(5);
+      LCD_DisplayON(&lcd);
       LCD_SetLocation(&lcd, 0, 0);
       LCD_WriteString(&lcd, "LDEFWH V2.1");
       LCD_SetLocation(&lcd, 0, lines / 2);
@@ -95,6 +99,8 @@ void fallback_defect_latch(){
 void turnOff(){
   set_bldc_motors(false);
   save_eeprom();
+  if(lcd_init_ok)
+    LCD_DisplayOFF(&lcd);
   //i2c send turnoff commmand
   restart = false;
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
@@ -106,6 +112,8 @@ void turnOffWithReset(){
   set_bldc_motors(false);
   //i2c send reset+turnoff command
   reset_eeprom();
+  if(lcd_init_ok)
+    LCD_DisplayOFF(&lcd);
   restart = false;
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   fallback_defect_latch();

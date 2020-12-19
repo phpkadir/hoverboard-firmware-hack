@@ -65,6 +65,18 @@ void buttonRelease(){
         stop_buzzer();
 }
 
+void noLCD(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(!((curBuzzTime / (PWM_FREQ) % 2)))
+        create_buzzer_wave(curBuzzTime, 10);
+}
+
+void noSlave(){
+    unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
+    if(!((curBuzzTime / (PWM_FREQ) % 2)))
+        create_buzzer_wave(curBuzzTime, 12);
+}
+
 void resetSound(){
     unsigned long curBuzzTime = get_mainCounter() - buzzerStart;
     switch(curBuzzTime / (PWM_FREQ / 8)){

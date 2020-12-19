@@ -145,24 +145,6 @@ main_start:  // only for defect boards if you think your hardware is working ple
   goto main_start;  // if this goto is used the board is defect and everybody knows: "Defect boards are liking defect code" :D
 }
 
-inline void swp(int* x,int* y){
-	int tmp = *x;
-	*x = *y;
-	*y = tmp;
-}
-inline void sort_array(int x[],int cnt){
-  for(int y=0;y<cnt-1; y++)
-		for(int z=y+1;z<cnt; z++)
-			if(x[y]>x[z])
-				swp(&x[y],&x[z]);
-}
-int calc_median(int x[],int cnt){
-  sort_array(x,cnt);
-	if(cnt%2)
-		return x[cnt/2];
-	else
-		return (x[cnt/2]+x[cnt/2+1])/2;
-}
 /** System Clock Configuration
 */
 void SystemClock_Config(void) {

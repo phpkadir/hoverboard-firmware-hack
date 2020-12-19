@@ -7,6 +7,9 @@ extern const void* lowBatTones[];
 
 void set_buzzerStart(unsigned long mainCnt);
 
+void noLCD();
+void noSlave();
+
 void lowBattery1();
 void lowBattery2();
 void lowBattery3();
