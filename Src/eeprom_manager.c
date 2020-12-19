@@ -6,8 +6,13 @@
 #include "stm32f1xx_hal_flash.h"
 #include "bldc.h"
 
+#define EEPROM_VALUES_LENGHT (32*1024)
+#define LATEST_EEPROM_VERSION 1
+
+volatile uint8_t EEPROM_VALUES[EEPROM_VALUES_LENGHT] __attribute__ ((section(".persistent_variables")));
+
 uint64_t get_eeprom_version(){
-    return 0;
+    return EEPROM_VALUES[EEPROM_VALUES_LENGHT-1-sizeof(uint64_t)];
 }
 
 bool check_crc_v1(){
@@ -23,52 +28,43 @@ void set_eeprom_version(uint64_t version){
 
 }
 
-void load_eeprom_v1(){
-
+void load_eeprom_v0(){
+    
 }
 
-void save_eeprom_v1(){
+void load_eeprom_v1(){
+    
+}
+
+
+void save_eeprom_latest(){
     HAL_FLASH_Unlock();
     HAL_FLASH_Lock();
     
 }
 
-const void (*eeprom_savers[])() = {
-    save_eeprom_v1
+const void (*eeprom_loaders[])() = {
+    load_eeprom_v0,
+    load_eeprom_v1
 };
 
-const int eeprom_savers_lenght = 1;
+const bool (*crc_checkers[])() = {
+    check_crc_v0,
+    check_crc_v1
+};
 
 void save_eeprom(){
-    eeprom_savers[eeprom_savers_lenght-1]();
+
 }
 
 void reset_eeprom(){
-    // clean eeprom set version 0
     set_eeprom_version(0);
 }
 
 void load_eeprom(){
-    switch(get_eeprom_version()){
-        case 1:
-            if(check_crc_v1()){
-                load_eeprom_v1();
-                return;
-            } else {
-                break;
-            }
-        case 0:
-            if(check_crc_v0()){
-                bldc_start_calibration();
-                return;
-            } else {
-                break;
-            }
-        default:  // unknown version -> reset
-            break;
-    }
-    reset_eeprom();
+    uint64_t version = get_eeprom_version();
+    if(crc_checkers[version])
+        eeprom_loaders[get_eeprom_version()];
+    else
+        reset_eeprom();
 }
-
-__attribute__ ((section(".persistent_variables")))
-volatile uint8_t persisten_mem[32*1024];
