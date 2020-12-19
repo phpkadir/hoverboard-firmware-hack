@@ -52,7 +52,8 @@ Src/stm32f1xx_it.c \
 Src/weaking.c \
 Src/buzzertones.c \
 Src/eeprom_manager.c \
-Src/generic_device.c
+Src/generic_device.c \
+Src/globals.c
 
 # ASM sources
 ASM_SOURCES =  \

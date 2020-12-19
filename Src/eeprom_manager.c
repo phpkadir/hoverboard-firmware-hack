@@ -5,6 +5,7 @@
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_flash.h"
 #include "bldc.h"
+#include "globals.h"
 
 #define EEPROM_VALUES_LENGHT (32*1024)
 #define LATEST_EEPROM_VERSION 1
