@@ -21,9 +21,9 @@ TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;
 
-volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
-volatile uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
-volatile uint8_t ppm_timeout = 0;
+//volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
+//volatile uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
+//volatile uint8_t ppm_timeout = 0;
 
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
@@ -70,7 +70,7 @@ void init_Display(uint8_t lines, uint8_t address){
       LCD_WriteString(&lcd, "Initializing...");
 }
 
-void fallback_defect_latch(){
+void fallback_defect_latch(){  // if tis code ist executed the board is defect
   stop_buzzer();
   set_bldc_to_led();
   while(1)
@@ -104,7 +104,7 @@ void turnOff(){
   //i2c send turnoff commmand
   restart = false;
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  fallback_defect_latch();
+  fallback_defect_latch();  // never reached
 }
 
  //BETA V0.1 WORKING
@@ -116,9 +116,9 @@ void turnOffWithReset(){
     LCD_DisplayOFF(&lcd);
   restart = false;
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
-  fallback_defect_latch();
+  fallback_defect_latch();  // never reached
 }
-
+/*
 bool ppm_valid = true;
 
 void PPM_ISR_Callback() {
@@ -157,7 +157,7 @@ void PPM_SysTick_Callback() {
 
 void PPM_Init() {
   GPIO_InitTypeDef GPIO_InitStruct;
-  /*Configure GPIO pin : PA3 */
+  // Configure GPIO pin : PA3
   GPIO_InitStruct.Pin = GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -172,12 +172,12 @@ void PPM_Init() {
   TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
   HAL_TIM_Base_Init(&TimHandle);
 
-  /* EXTI interrupt init*/
+  // EXTI interrupt init
   HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
   HAL_TIM_Base_Start(&TimHandle);
 }
-/*
+*//*
 void Nunchuck_Init() {
     //-- START -- init WiiNunchuck
   i2cBuffer[0] = 0xF0;

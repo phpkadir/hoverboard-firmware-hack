@@ -25,9 +25,8 @@ int calc_median(int x[],int cnt){
 int32_t get_phase(){
     int32_t* cache_data32 = &cache_data;
     int x = 0;
-    for(uint8_t a = 0; a< 2; a++)
+    for(uint8_t board = 0; board< 2; board++)
         for(uint8_t b = 0; b< 2; b++, x++)
-            cache_data32[x] = virutal_phase[a][b];
-    sort_array(cache_data32,x);
+            cache_data32[x] = virutal_phase[board][b];
     return calc_median(cache_data32,x);
 }
