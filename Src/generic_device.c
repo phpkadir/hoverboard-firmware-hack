@@ -9,6 +9,7 @@
 #include "config.h"  // the config
 #include "comms.h"
 #include "control.h"
+#include "generic_device.h"
 
 #define BUFFERSIZE 128
 #define VAL_CNT 2
@@ -44,9 +45,13 @@ int clean_adc_half(uint32_t inval){
   return outval * THROTTLE_MAX / (ADC_MAX - ((DEAD_ZONE*3)/2));
 }
 
+int throttle_calc(int cleaned_adc){
+  return ((cleaned_adc * cleaned_adc * SIGN(cleaned_adc) / THROTTLE_MAX ) * 2 + cleaned_adc ) / 3;
+}
+
 void device_specific(){
-  int tmp = -clean_adc_full(value_buffer(virtual_ival[0][0],0));
-  int tmp3 = ((tmp * tmp * SIGN(tmp) / THROTTLE_MAX ) * 2 + tmp ) / 3;
+  int throttle[2];
+  int tmp3 = throttle_calc(-clean_adc_full(value_buffer(virtual_ival[0][0],0)));
   if(tmp3 < 0) {
     tmp3 = tmp3 * THROTTLE_REVERSE_MAX * (-1) / THROTTLE_MAX;
     if(tmp3 < THROTTLE_REVERSE_MAX / 10)
@@ -55,8 +60,8 @@ void device_specific(){
 
   if(tmp3 >= THROTTLE_REVERSE_MAX / 10)
     stop_buzzer();
-
-  set_throttle(tmp3, tmp3);
+  calc_torque_per_wheel(tmp3, 0.0f, throttle);
+  set_throttle(throttle[0], throttle[1]);
 }
 
 void device_init(){
@@ -69,6 +74,26 @@ void device_init(){
     for(int j = 0; j < BUFFERSIZE;j++)
       cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
   }
+}
+
+float calc_steering_eagle(int inval){
+  return (float)inval * STEERING_EAGLE_FACTOR;
+}
+
+inline void calc_torque_per_wheel(int throttle, float steering_eagle, int* torque){
+  int back_wheel = WHEELBASE / tan(abs(steering_eagle));
+  int radius_main = sqrt(pow(back_wheel, 2)+pow(WHEELBASE / 2 ,2));
+#if !defined(STEERING)
+  torque[0] = (back_wheel + WHEEL_WIDTH/2 * SIGN(steering_eagle)) * throttle / radius_main;
+  torque[1] = (back_wheel - WHEEL_WIDTH/2 * SIGN(steering_eagle)) * throttle / radius_main;
+#else
+  #define wheel_bl (back_wheel + (WHEEL_WIDTH/2 * SIGN(steering_eagle) - STEERING_TO_WHEEL_DIST))
+  #define wheel_br (back_wheel - (WHEEL_WIDTH/2 * SIGN(steering_eagle) - STEERING_TO_WHEEL_DIST))
+  torque[0] = (sqrt(pow(wheel_bl, 2)+pow(WHEELBASE,2)) + STEERING_TO_WHEEL_DIST * SIGN(steering_eagle)) * throttle / radius_main;
+  torque[1] = (sqrt(pow(wheel_br, 2)+pow(WHEELBASE,2)) - STEERING_TO_WHEEL_DIST * SIGN(steering_eagle)) * throttle / radius_main;
+  #undef wheel_bl
+  #undef wheel_br
+#endif
 }
 
 void device_button(){
