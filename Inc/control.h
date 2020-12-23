@@ -13,9 +13,3 @@ void turnOff();
 void turnOffWithReset();
 
 void init_Display(uint8_t lines, uint8_t address);
-
-int clean_adc_full(uint32_t inval);
-int clean_adc_half(uint32_t inval);
-int calc_torque(int throttle,int breaks);
-void calc_torque_per_wheel(int throttle, float steering_eagle, int* torque);
-float calc_steering_eagle(int inval);

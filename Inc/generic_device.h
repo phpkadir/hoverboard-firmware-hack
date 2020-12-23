@@ -2,9 +2,9 @@
 #include <stdint.h>
 
 #define STEERING_EAGLE_FACTOR 0.01
-#define WHEELBASE 2
-#define WHEEL_WIDTH 1
-#define STEERING_TO_WHEEL_DIST 1
+#define WHEELBASE 35
+#define WHEEL_WIDTH 10
+#define STEERING_TO_WHEEL_DIST 5
 
 
 extern const uint32_t lowBattery_length;

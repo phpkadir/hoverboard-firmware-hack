@@ -118,6 +118,7 @@ void turnOffWithReset(){
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
   fallback_defect_latch();  // never reached
 }
+
 /*
 bool ppm_valid = true;
 

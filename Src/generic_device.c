@@ -46,33 +46,20 @@ int clean_adc_half(uint32_t inval){
 }
 
 int throttle_calc(int cleaned_adc){
-  return ((cleaned_adc * cleaned_adc * SIGN(cleaned_adc) / THROTTLE_MAX ) * 2 + cleaned_adc ) / 3;
+  return cleaned_adc < 0 ?
+    ((cleaned_adc * cleaned_adc  / THROTTLE_REVERSE_MAX ) * 2 + cleaned_adc ) / 3 :
+    ((cleaned_adc * cleaned_adc / THROTTLE_MAX ) * 2 + cleaned_adc ) / 3;
 }
 
-void device_specific(){
-  int throttle[2];
-  int tmp3 = throttle_calc(-clean_adc_full(value_buffer(virtual_ival[0][0],0)));
-  if(tmp3 < 0) {
-    tmp3 = tmp3 * THROTTLE_REVERSE_MAX * (-1) / THROTTLE_MAX;
-    if(tmp3 < THROTTLE_REVERSE_MAX / 10)
-      set_buzzer(reverseSound);
+int calc_torque(int throttle,int breaks){
+  if(breaks == 0){  // drive forward
+    return throttle;
+}
+  else if(breaks == PWM_MAX){  // drive backwards
+    return -throttle;
   }
-
-  if(tmp3 >= THROTTLE_REVERSE_MAX / 10)
-    stop_buzzer();
-  calc_torque_per_wheel(tmp3, 0.0f, throttle);
-  set_throttle(throttle[0], throttle[1]);
-}
-
-void device_init(){
-  HAL_Delay(50);
-  init_Display(4,0x3F);
-  set_weaking(3);
-  //PPM_Init();
-  for(int i = 0; i < VAL_CNT ; i++){
-    cur_buff_val_sum[i] = index[i] = 0;
-    for(int j = 0; j < BUFFERSIZE;j++)
-      cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
+  else{
+    return throttle-breaks;
   }
 }
 
@@ -95,6 +82,42 @@ inline void calc_torque_per_wheel(int throttle, float steering_eagle, int* torqu
   #undef wheel_br
 #endif
 }
+
+void device_specific(){
+  int tmp_throttle_per_wheel[2];
+  int tmp_throttle;
+    calc_torque_per_wheel(
+      tmp_throttle = throttle_calc(
+        calc_torque(
+          clean_adc_half(virtual_ival[0][0]),
+          clean_adc_half(virtual_ival[0][1])
+        )
+      ),
+      calc_steering_eagle(clean_adc_full(virtual_ival[1][0])),
+      tmp_throttle_per_wheel);
+    #ifdef BEEPS_BACKWARD
+    if(tmp_throttle < THROTTLE_REVERSE_MAX / 10)
+      set_buzzer(reverseSound);
+    else
+      stop_buzzer();
+    #endif
+    set_throttle(tmp_throttle_per_wheel[0], tmp_throttle_per_wheel[1]);
+
+}
+
+void device_init(){
+  HAL_Delay(50);
+  init_Display(4,0x3F);
+  set_weaking(3);
+  //PPM_Init();
+  for(int i = 0; i < VAL_CNT ; i++){
+    cur_buff_val_sum[i] = index[i] = 0;
+    for(int j = 0; j < BUFFERSIZE;j++)
+      cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
+  }
+}
+
+
 
 void device_button(){
   /*if(divisor == 1 && weak){
