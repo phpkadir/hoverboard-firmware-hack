@@ -25,17 +25,34 @@ uint32_t value_buffer(uint32_t in,int val){
   return (cur_buff_val_sum[val] / (BUFFERSIZE)) << 16;
 }
 
+uint8_t val_len[20][4];
+
 void init_debug_screen(){
   for(int i = 0; i < 4; i++)
-    for(int j = 0; j < 20; j++)
-    Display_show_string(j, i, " "); // empty screen
+    for(int j = 0; j < 20; j++){
+      Display_show_string(j, i, " "); // empty screen
+      val_len[j][i] = 0;
+    }
   Display_show_string(0,0, "Phase:");
   Display_show_string(0,1, "Pos:");
   Display_show_string(0,2, "blockcur:");
   Display_show_string(0,3, "Pwr:");
 }
-void update_debug_screen(){
 
+unsigned long lst_1update = 0;
+uint8_t phase = 0;
+void update_debug_screen(){
+  
+}
+
+void update_num(uint8_t x, uint8_t y, int value){
+  char buff[] = "                    ";
+  uint8_t tmp_len = Display_show_int(x, y, value);
+  if(tmp_len > val_len[x][y]){
+    buff[tmp_len - val_len[x][y]]='\0';
+    Display_show_string(x-tmp_len,y,buff);
+  }
+  val_len[x][y] = tmp_len;
 }
 //bobbycar
 int clean_adc_full(uint32_t inval){
