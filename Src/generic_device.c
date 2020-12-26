@@ -25,7 +25,18 @@ uint32_t value_buffer(uint32_t in,int val){
   return (cur_buff_val_sum[val] / (BUFFERSIZE)) << 16;
 }
 
+void init_debug_screen(){
+  for(int i = 0; i < 4; i++)
+    for(int j = 0; j < 20; j++)
+    Display_show_string(j, i, " "); // empty screen
+  Display_show_string(0,0, "Phase:");
+  Display_show_string(0,1, "Pos:");
+  Display_show_string(0,2, "blockcur:");
+  Display_show_string(0,3, "Pwr:");
+}
+void update_debug_screen(){
 
+}
 //bobbycar
 int clean_adc_full(uint32_t inval){
   int outval = (uint32_t)(inval >> 16) - ADC_MID;
@@ -102,7 +113,7 @@ void device_specific(){
       stop_buzzer();
     #endif
     set_throttle(tmp_throttle_per_wheel[0], tmp_throttle_per_wheel[1]);
-
+  update_debug_screen();
 }
 
 void device_init(){
@@ -115,6 +126,7 @@ void device_init(){
     for(int j = 0; j < BUFFERSIZE;j++)
       cur_buff_val_sum[i] += (buff_vals[i][j] = ADC_MID);
   }
+  init_debug_screen();
 }
 
 
