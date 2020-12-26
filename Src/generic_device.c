@@ -36,13 +36,17 @@ void init_debug_screen(){
   Display_show_string(0,0, "Phase:");
   Display_show_string(0,1, "Pos:");
   Display_show_string(0,2, "blockcur:");
-  Display_show_string(0,3, "Pwr:");
+  Display_show_string(0,3, "Pwr:               V");
 }
 
 unsigned long lst_1update = 0;
 uint8_t phase = 0;
 void update_debug_screen(){
-  
+  update_num(19,0, phase_period[0]+phase_period[1]/2);
+  update_num(16,1, last_pos[0]);
+  update_num(19,1, last_pos[0]);
+  update_num(19,2, blockcurlr[0]+blockcurlr[1]);
+  Display_show_float(18,3,ADC122BATTERY_VOLTAGE(battery_voltage),5);
 }
 
 void update_num(uint8_t x, uint8_t y, int value){
