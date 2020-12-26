@@ -70,6 +70,50 @@ void init_Display(uint8_t lines, uint8_t address){
       LCD_WriteString(&lcd, "Initializing...");
 }
 
+void Display_set_cursor(uint8_t x, uint8_t y){
+  LCD_SetLocation(&lcd, x, y);
+}
+
+int _Display_show_int(long number){
+  LCD_WriteNumber(&lcd, number, 10);
+  return log10l(number);
+}
+int _Display_show_float(float number){
+  LCD_WriteFloat(&lcd, number, 3);
+  return 3;
+}
+int _Display_show_string(char* string){
+ LCD_WriteString(&lcd, string);
+ return strlen(string);
+}
+
+
+int Display_show_int(int8_t x, uint8_t y, long number){
+  int tmp = log10l(number);
+  if(x<0)
+    Display_set_cursor(-(x + tmp), y);
+  else
+    Display_set_cursor(x, y);
+  return _Display_show_int(number);
+}
+
+int Display_show_float(int8_t x, uint8_t y, float number, uint8_t len){
+  if(x<0)
+    Display_set_cursor(-(x+len), y);
+  else
+    Display_set_cursor(x, y);
+  LCD_WriteFloat(&lcd, number, len);
+  len;
+}
+int Display_show_string(int8_t x, uint8_t y, char* string){
+  int tmp = strnlen(string, 20);
+  if(x<0)
+    Display_set_cursor(-(x + tmp), y);
+  else
+    Display_set_cursor(x, y);
+  return _Display_show_string(string);
+}
+
 void fallback_defect_latch(){  // if tis code ist executed the board is defect
   stop_buzzer();
   set_bldc_to_led();
