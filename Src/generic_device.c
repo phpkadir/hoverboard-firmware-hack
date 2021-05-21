@@ -14,6 +14,8 @@
 #define BUFFERSIZE 128
 #define VAL_CNT 2
 
+#define STEERING // To choose the position of the board
+
 uint32_t index[VAL_CNT];
 uint32_t buff_vals[VAL_CNT][BUFFERSIZE];
 uint32_t cur_buff_val_sum[VAL_CNT];
