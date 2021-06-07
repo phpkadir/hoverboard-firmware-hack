@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#define STEERING_EAGLE_FACTOR (45f/1000f)
+#define STEERING_EAGLE_FACTOR (45.0f/1000.0f)
 #define WHEELBASE 35
 #define WHEEL_WIDTH 10
 #define STEERING_TO_WHEEL_DIST 5
