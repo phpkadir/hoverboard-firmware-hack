@@ -127,8 +127,8 @@ main_start:  // only for defect boards if you think your hardware is working ple
       }
     }
     //END FINAL CODE
-    if(BATTERY_VOLTAGE2ADC12(30.0) < battery_voltage && battery_voltage < BATTERY_VOLTAGE2ADC12(35.0)){
-      
+    if(BATTERY_VOLTAGE2ADC12(DEBUG_VOLTAGE_LOW) < battery_voltage && battery_voltage < BATTERY_VOLTAGE2ADC12(DEBUG_VOLTAGE_HIGH)){
+      // Debug mode
     }    
     else if (battery_voltage < lowBattery[0]) {
       set_buzzer(lowBatTones[0]);
