@@ -126,9 +126,11 @@ main_start:  // only for defect boards if you think your hardware is working ple
         }
       }
     }
-    
     //END FINAL CODE
-    if  (battery_voltage < lowBattery[0]) {
+    if(BATTERY_VOLTAGE2ADC12(30.0) < battery_voltage && battery_voltage < BATTERY_VOLTAGE2ADC12(35.0)){
+      
+    }    
+    else if (battery_voltage < lowBattery[0]) {
       set_buzzer(lowBatTones[0]);
       set_bldc_motors(false);
       HAL_Delay(200);
@@ -136,7 +138,7 @@ main_start:  // only for defect boards if you think your hardware is working ple
       break;
     }
     for(uint8_t x=1;x<lowBattery_length;x++)
-      if  (battery_voltage < BATTERY_VOLTAGE2ADC12(BAT_LOW_LVL2)) {
+      if  (battery_voltage < lowBattery[x]) {
         set_buzzer(lowBatTones[x]);
         LIMIT_CURRENT(5 + 5*x);  // limiting the motorcurrent to a lower value
         break;

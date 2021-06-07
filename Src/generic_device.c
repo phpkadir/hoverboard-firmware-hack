@@ -122,12 +122,9 @@ void device_specific(){
   int tmp_throttle;
     calc_torque_per_wheel(
       tmp_throttle = throttle_calc(
-        calc_torque(
-          clean_adc_half(virtual_ival[0][0]),
-          clean_adc_half(virtual_ival[0][1])
-        )
+        clean_adc_full(virtual_ival[0][0])
       ),
-      calc_steering_eagle(clean_adc_full(virtual_ival[1][0])),
+      calc_steering_eagle(clean_adc_full(virtual_ival[0][1])),
       tmp_throttle_per_wheel);
     #ifdef BEEPS_BACKWARD
     if(tmp_throttle < THROTTLE_REVERSE_MAX / 10)
