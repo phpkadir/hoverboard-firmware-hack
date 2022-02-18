@@ -30,11 +30,11 @@ uint32_t value_buffer(uint32_t in,int val){
 uint8_t val_len[20][4];
 
 void init_debug_screen(){
-  for(int i = 0; i < 4; i++)
-    for(int j = 0; j < 20; j++){
-      Display_show_string(j, i, " "); // empty screen
-      val_len[j][i] = 0;
-    }
+  for(int x = 0; x < 20; x++)
+    for(int y = 0; y < 4; y++)
+      val_len = 0;
+  init_Display(4,0x34);
+  Display_Clear();
   Display_show_string(0,0, "Phase:");
   Display_show_string(0,1, "Pos:");
   Display_show_string(0,2, "blockcur:");
@@ -53,12 +53,14 @@ void update_debug_screen(){
 
 void update_num(uint8_t x, uint8_t y, int value){
   char buff[] = "                    ";
-  uint8_t tmp_len = Display_show_int(x, y, value);
-  if(tmp_len > val_len[x][y]){
-    buff[tmp_len - val_len[x][y]]='\0';
+  int8_t tmp_len = Display_show_int(x, y, value);
+  int8_t old_len = val_len[x][y];
+  if(tmp_len < old_len){
+    buff[old_len - tmp_len]='\0';
     Display_show_string(x-tmp_len,y,buff);
   }
-  val_len[x][y] = tmp_len;
+  for(int i = 0; x < MAX(tmp_len,old_len); i++)
+    val_len[x-i][y] = MAX(tmp_len-i,0);
 }
 //bobbycar
 int clean_adc_full(uint32_t inval){

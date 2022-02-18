@@ -10,8 +10,8 @@
 
 //device specific
 #define DEAD_ZONE 64
-#define BAT_CELL_CNT     15.0
-#define BAT_FULL_CELL    4.1
+#define BAT_CELL_CNT     10.0
+#define BAT_FULL_CELL    4.2
 #define BAT_RATED_CELL   3.6
 #define BAT_LOW1_CELL    3.4
 #define BAT_LOW2_CELL    3.2

@@ -11,6 +11,7 @@ void turnOff();
 void turnOffWithReset();
 
 void init_Display(uint8_t lines, uint8_t address);
+void Display_Clear();
 void Display_set_cursor(uint8_t x, uint8_t y);
 int _Display_show_int(long number);
 int _Display_show_float(float number);

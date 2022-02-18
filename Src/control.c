@@ -60,7 +60,7 @@ void init_Display(uint8_t lines, uint8_t address){
             set_buzzer(noLCD);
         else
             lcd_init_ok = true;
-
+      LCD_CursorOFF(&lcd);
       LCD_ClearDisplay(&lcd);
       HAL_Delay(5);
       LCD_DisplayON(&lcd);
@@ -70,34 +70,52 @@ void init_Display(uint8_t lines, uint8_t address){
       LCD_WriteString(&lcd, "Initializing...");
 }
 
+void Display_Clear(){
+  if(!lcd_init_ok)
+    return;
+  LCD_ClearDisplay(&lcd);
+}
+
 void Display_set_cursor(uint8_t x, uint8_t y){
+  if(!lcd_init_ok)
+    return;
   LCD_SetLocation(&lcd, x, y);
 }
 
 int _Display_show_int(long number){
+  if(!lcd_init_ok)
+    return 0;
   LCD_WriteNumber(&lcd, number, 10);
   return log10l(number);
 }
 int _Display_show_float(float number){
+  if(!lcd_init_ok)
+    return 0;
   LCD_WriteFloat(&lcd, number, 3);
   return 3;
 }
 int _Display_show_string(char* string){
+  if(!lcd_init_ok)
+    return 0;
  LCD_WriteString(&lcd, string);
  return strlen(string);
 }
 
 
 int Display_show_int(int8_t x, uint8_t y, long number){
+  if(!lcd_init_ok)
+    return 0;
   int tmp = log10l(number);
-  if(x<0)
-    Display_set_cursor(-(x + tmp), y);
+  if(x < tmp)
+    Display_set_cursor(x - tmp, y);
   else
     Display_set_cursor(x, y);
   return _Display_show_int(number);
 }
 
 int Display_show_float(int8_t x, uint8_t y, float number, uint8_t len){
+  if(!lcd_init_ok)
+    return 0;
   if(x<0)
     Display_set_cursor(-(x+len), y);
   else
@@ -106,9 +124,11 @@ int Display_show_float(int8_t x, uint8_t y, float number, uint8_t len){
   len;
 }
 int Display_show_string(int8_t x, uint8_t y, char* string){
+  if(!lcd_init_ok)
+    return 0;
   int tmp = strnlen(string, 20);
-  if(x<0)
-    Display_set_cursor(-(x + tmp), y);
+  if(x<tmp)
+    Display_set_cursor(x - tmp, y);
   else
     Display_set_cursor(x, y);
   return _Display_show_string(string);
