@@ -32,7 +32,7 @@ uint8_t val_len[20][4];
 void init_debug_screen(){
   for(int x = 0; x < 20; x++)
     for(int y = 0; y < 4; y++)
-      val_len = 0;
+      val_len[x][y] = 0;
   init_Display(4,0x34);
   Display_Clear();
   Display_show_string(0,0, "Phase:");

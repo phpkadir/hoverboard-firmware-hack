@@ -116,7 +116,7 @@ volatile int throttlelr[2];  // throttle for calcing pwm and weakening
 volatile unsigned int timer[2];  // timer for speed measuring
 volatile uint8_t last_pos[2];  // for speed measuring and sensorless control
 volatile int blockcurlr[2];  // Current for sensorles bldc
-volatile int internal_phase_period[2];  // For internal calculations only  PRIVATE NOT IN C HEADER
+volatile static int internal_phase_period[2];  // For internal calculations only  PRIVATE NOT IN C HEADER
 
 
 unsigned long get_mainCounter(){
@@ -125,52 +125,52 @@ unsigned long get_mainCounter(){
 
 
 typedef void (*setMotorType)(int *hPhase);
-void set_motor_r(int *hPhase){
+static void set_motor_r(int *hPhase){
   RIGHT_TIM->RIGHT_TIM_U = CLAMP(hPhase[0] + PWM_RES / 2, 10, PWM_RES-10);
   RIGHT_TIM->RIGHT_TIM_V = CLAMP(hPhase[1] + PWM_RES / 2, 10, PWM_RES-10);
   RIGHT_TIM->RIGHT_TIM_W = CLAMP(hPhase[2] + PWM_RES / 2, 10, PWM_RES-10);
 }
-void set_motor_l(int *hPhase){
+static void set_motor_l(int *hPhase){
   LEFT_TIM->LEFT_TIM_U = CLAMP(hPhase[0] + PWM_RES / 2, 10, PWM_RES-10);
   LEFT_TIM->LEFT_TIM_V = CLAMP(hPhase[1] + PWM_RES / 2, 10, PWM_RES-10);
   LEFT_TIM->LEFT_TIM_W = CLAMP(hPhase[2] + PWM_RES / 2, 10, PWM_RES-10);
 }
-const setMotorType set_motor[2] = { //array for loop
+static const setMotorType set_motor[2] = { //array for loop
   set_motor_l,
   set_motor_r
 };
 
-uint8_t get_pos_l(){
+static uint8_t get_pos_l(){
   return hall2pos[!(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN)]
     [!(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN)]
       [!(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN)];
 }
-uint8_t get_pos_r(){
+static uint8_t get_pos_r(){
   return hall2pos[!(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN)]
     [!(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN)]
       [!(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN)];
 }
 typedef uint8_t (*getPosType)();
-const getPosType get_pos[2]={
+static const getPosType get_pos[2]={
   get_pos_l,
   get_pos_r
 };
 
 typedef void (*SetBoolFunc)(bool enable);
-void set_tim_l(bool enable){
+static void set_tim_l(bool enable){
   if(enable)
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
   else
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
 }
-void set_tim_r(bool enable){
+static void set_tim_r(bool enable){
   if(enable)
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
   else
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
 }
 
-const SetBoolFunc set_tim_lr[2] = {  // disable/enable motors
+static const SetBoolFunc set_tim_lr[2] = {  // disable/enable motors
   set_tim_l,
   set_tim_r
 };
@@ -178,14 +178,15 @@ const SetBoolFunc set_tim_lr[2] = {  // disable/enable motors
 void nullFunc(){}  // Function for empty funktionpointer becasue Jump NULL != ret
 
 typedef void (*SetPhaseType)(int phase);
-void set_phase_l(int phase){
+static void set_phase_l(int phase){
 #if defined(INVERT_L_DIRECTION)  // for other hardware needs this function to be rewritten
   phase_period[0] = -phase;
 #else
   phase_period[0] = phase;
 #endif
 }
-void set_phase_r(int phase){
+
+static void set_phase_r(int phase){
 #if defined(INVERT_R_DIRECTION)
   phase_period[1] = -phase;
 #else
@@ -193,7 +194,7 @@ void set_phase_r(int phase){
 #endif
 }
 
-const SetPhaseType set_phase_lr[2] = {  // disable/enable motors
+static const SetPhaseType set_phase_lr[2] = {  // disable/enable motors
   set_phase_l,
   set_phase_r
 };
@@ -204,7 +205,7 @@ volatile WeakingPtr currentWeaking = nullFuncWeak;  // Pointer for calculing fea
 volatile TimingPtr currentTiming = no_timing;  // Pointer for calculating the timing of the motor (to prebuild the electric fields)
 #endif
 
-uint8_t next_pos(uint8_t oldpos, int8_t direction){
+static uint8_t next_pos(uint8_t oldpos, int8_t direction){
   switch(direction){
     case -1:
       return (oldpos + 5) % 6;  // -1
@@ -263,7 +264,7 @@ void sensored_brushless_countrol(){
   }
 }
 
-void calibration_func();  // for correct var accessing and do not set to public
+static void calibration_func();  // for correct var accessing and do not set to public
 
 void stop_buzzer(){
   buzzerFunc = nullFunc;
@@ -286,7 +287,7 @@ void set_buzzer(void* buzzerfunc){
   buzzerFunc = buzzerfunc;
 }
 
-void calibration_func(){
+static void calibration_func(){
   if(mainCounter < 1024)  // calibrate ADC offsets
     for(int x = 0; x < 6; x++)
       adc_offset[x] = (adc_array[x] + adc_offset[x]) / 2;
