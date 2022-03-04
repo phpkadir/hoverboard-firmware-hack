@@ -45,8 +45,8 @@ unsigned long lst_1update = 0;
 uint8_t phase = 0;
 void update_debug_screen(){
   update_num(19,0, phase_period[0]+phase_period[1]/2);
-  update_num(16,1, last_pos[0]);
-  update_num(19,1, last_pos[0]);
+  update_num(17,1, last_pos[0]);
+  update_num(19,1, last_pos[1]);
   update_num(19,2, blockcurlr[0]+blockcurlr[1]);
   Display_show_float(18,3,ADC122BATTERY_VOLTAGE(battery_voltage),5);
 }
@@ -135,7 +135,8 @@ void device_specific(){
       stop_buzzer();
     #endif
     set_throttle(tmp_throttle_per_wheel[0], tmp_throttle_per_wheel[1]);
-  update_debug_screen();
+  if(!get_mainCounter()%1000)
+    update_debug_screen();
 }
 
 void device_init(){
