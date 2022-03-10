@@ -33,7 +33,6 @@ void init_debug_screen(){
   for(int x = 0; x < 20; x++)
     for(int y = 0; y < 4; y++)
       val_len[x][y] = 0;
-  init_Display(4,0x34);
   Display_Clear();
   Display_show_string(0,0, "Phase:");
   Display_show_string(0,1, "Pos:");
@@ -141,7 +140,7 @@ void device_specific(){
 
 void device_init(){
   HAL_Delay(50);
-  init_Display(4,0x3F);
+  init_Display(4,0x3F,false);
   set_weaking(3);
   //PPM_Init();
   for(int i = 0; i < VAL_CNT ; i++){

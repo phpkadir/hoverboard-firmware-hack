@@ -10,8 +10,9 @@ extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 void turnOff();
 void turnOffWithReset();
 
-void init_Display(uint8_t lines, uint8_t address);
+void init_Display(uint8_t lines, uint8_t address, bool backlight);
 void Display_Clear();
+void Display_set_backlight(bool on);
 void Display_set_cursor(uint8_t x, uint8_t y);
 int _Display_show_int(long number);
 int _Display_show_float(float number);

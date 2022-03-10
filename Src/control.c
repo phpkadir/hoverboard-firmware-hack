@@ -33,7 +33,7 @@ uint8_t scan_i2c_next_address(uint8_t start_address){
   return 255;
 }
 
-void init_Display(uint8_t lines, uint8_t address){
+void init_Display(uint8_t lines, uint8_t address, bool backlight){
   
         lcd.pcf8574.PCF_I2C_ADDRESS = address;
         lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
@@ -60,10 +60,11 @@ void init_Display(uint8_t lines, uint8_t address){
             set_buzzer(noLCD);
         else
             lcd_init_ok = true;
-      LCD_CursorOFF(&lcd);
+      if(backlight)
+        LCD_CursorOFF(&lcd);
       LCD_ClearDisplay(&lcd);
       HAL_Delay(5);
-      LCD_DisplayON(&lcd);
+      Display_set_backlight(backlight);
       LCD_SetLocation(&lcd, 0, 0);
       LCD_WriteString(&lcd, "LDEFWH V2.1");
       LCD_SetLocation(&lcd, 0, lines / 2);
@@ -74,6 +75,13 @@ void Display_Clear(){
   if(!lcd_init_ok)
     return;
   LCD_ClearDisplay(&lcd);
+}
+
+void Display_set_backlight(bool on){
+  if(on)
+    LCD_DisplayON(&lcd);
+  else
+    LCD_DisplayOFF(&lcd);
 }
 
 void Display_set_cursor(uint8_t x, uint8_t y){
